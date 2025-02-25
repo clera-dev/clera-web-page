@@ -1,0 +1,239 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 10, 10, 15;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+  }
+
+  .dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.8;
+    stroke-width: 15px;
+    filter: drop-shadow(0 0 25px rgba(185, 211, 255, 0.3))
+           drop-shadow(0 0 50px rgba(185, 211, 255, 0.15));
+  }
+  50% {
+    opacity: 1;
+    stroke-width: 18px;
+    filter: drop-shadow(0 0 35px rgba(185, 211, 255, 0.4))
+           drop-shadow(0 0 60px rgba(185, 211, 255, 0.2));
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 35px rgba(66, 153, 225, 0.6), 0 0 55px rgba(66, 153, 225, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(66, 153, 225, 0.8), 0 0 65px rgba(66, 153, 225, 0.6);
+  }
+}
+
+@keyframes soundWaveA {
+  0% {
+    opacity: 0;
+    transform: scale(0.93) rotate(0deg);
+    stroke-width: 3px;
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1) rotate(180deg);
+    stroke-width: 2px;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.07) rotate(360deg);
+    stroke-width: 1px;
+  }
+}
+
+@keyframes soundWaveB {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) rotate(360deg);
+    stroke-width: 3px;
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1) rotate(180deg);
+    stroke-width: 2px;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05) rotate(0deg);
+    stroke-width: 1px;
+  }
+}
+
+@keyframes soundWaveC {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+    stroke-width: 3px;
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+    stroke-width: 2px;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+    stroke-width: 1px;
+  }
+}
+
+@keyframes dotSpin {
+  0% {
+    opacity: 0.2;
+    transform: rotate(0deg) translate(0, -150%) scale(0.2);
+  }
+  50% {
+    opacity: 1;
+    transform: rotate(180deg) translate(0, -150%) scale(1);
+  }
+  100% {
+    opacity: 0.2;
+    transform: rotate(360deg) translate(0, -150%) scale(0.2);
+  }
+}
+
+.sound-wave-1 {
+  animation: soundWaveA 3s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.sound-wave-2 {
+  animation: soundWaveB 2.5s ease-in-out infinite 0.3s;
+  transform-origin: center;
+}
+
+.sound-wave-3 {
+  animation: soundWaveC 2.8s ease-in-out infinite 0.6s;
+  transform-origin: center;
+}
+
+.sound-wave-4 {
+  animation: soundWaveB 3.2s ease-in-out infinite 0.9s;
+  transform-origin: center;
+}
+
+.sound-wave-5 {
+  animation: soundWaveA 2.7s ease-in-out infinite 1.2s;
+  transform-origin: center;
+}
+
+.sound-wave-6 {
+  animation: soundWaveC 3s ease-in-out infinite 1.5s;
+  transform-origin: center;
+}
+
+.energy-ring {
+  animation: pulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 25px rgba(185, 211, 255, 0.3))
+         drop-shadow(0 0 50px rgba(185, 211, 255, 0.15));
+  stroke-linecap: round;
+}
+
+.energy-ring-static {
+  filter: drop-shadow(0 0 35px rgba(185, 211, 255, 0.4))
+         drop-shadow(0 0 60px rgba(185, 211, 255, 0.2));
+  stroke-linecap: round;
+}
+
+.energy-ring::before,
+.energy-ring::after,
+.energy-ring-static::before,
+.energy-ring-static::after {
+  display: none;
+}
+
+/* Add this new style for the typing animation */
+.typed-text {
+  display: inline-block;
+}
+
+.typed-text-highlight {
+  color: #7fb3f5;
+}
+
+@keyframes shine {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shine {
+  animation: shine 1.5s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 1.2s ease-out forwards;
+}
+
+.animate-fade-in-up-delay-1 {
+  animation: fadeInUp 1.2s ease-out 0.8s forwards;
+  opacity: 0;
+}
+
