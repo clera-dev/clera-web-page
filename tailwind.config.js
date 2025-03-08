@@ -38,8 +38,13 @@ module.exports = {
       fontFamily: {
         sans: ['var(--font-sans)'],
       },
+      animation: {
+        'border-travel': 'border-travel 8s linear infinite',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/aspect-ratio'),
+  ],
 }
 

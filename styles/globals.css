@@ -15,6 +15,8 @@ body {
     rgb(var(--background-start-rgb)),
     rgb(var(--background-end-rgb))
   );
+  min-height: 100vh;
+  overflow-y: auto;
 }
 
 @layer base {
@@ -235,5 +237,163 @@ body {
 .animate-fade-in-up-delay-1 {
   animation: fadeInUp 1.2s ease-out 0.8s forwards;
   opacity: 0;
+}
+
+/* Add these styles for the glowing effect */
+.rounded-2\.5xl {
+  border-radius: 1.25rem;
+}
+
+.border-0\.75 {
+  border-width: 0.75px;
+}
+
+.-tracking-4 {
+  letter-spacing: -0.04em;
+}
+
+/* Add any dark mode specific styles if needed */
+.dark .dark\:shadow-\[0px_0px_27px_0px_\#2D2D2D\] {
+  box-shadow: 0px 0px 27px 0px #2D2D2D;
+}
+
+/* Add these styles for the Macbook frame */
+.macbook-container {
+  position: relative;
+  padding: 2% 2% 2.5% 2%;
+  background: #2a2a2a;
+  border-radius: 20px;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.2),
+              0 20px 40px rgba(0,0,0,0.4);
+  transform-origin: center top;
+  perspective: 1000px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  transform-style: preserve-3d;
+}
+
+.macbook-frame {
+  position: relative;
+  background: #2a2a2a;
+  border-radius: 20px;
+  transform-style: preserve-3d;
+}
+
+.screen-bezel {
+  position: relative;
+  background: #1a1a1a;
+  border-radius: 10px 10px 0 0;
+  padding: 2%;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.screen-content {
+  aspect-ratio: 16/10;
+  background: #000;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.base {
+  position: relative;
+  height: 60px;
+  background: linear-gradient(180deg, #2a2a2a 0%, #3a3a3a 100%);
+  border-radius: 0 0 10px 10px;
+  margin-top: 2px;
+  border: 1px solid rgba(255,255,255,0.1);
+  transform-style: preserve-3d;
+  transform: translateZ(-10px);
+}
+
+.trackpad {
+  position: absolute;
+  width: 40%;
+  height: 30px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 3px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+
+/* Add this new style for the image */
+.screen-content img {
+  opacity: 0.9;
+  filter: brightness(1.1);
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Additional animations from app/globals.css */
+@keyframes border-travel {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(calc(100% - 16px), 0);
+  }
+  50% {
+    transform: translate(calc(100% - 16px), calc(100% - 16px));
+  }
+  75% {
+    transform: translate(0, calc(100% - 16px));
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.animate-border-travel {
+  animation: border-travel 8s linear infinite;
+}
+
+/* Typing animation for security card */
+@keyframes typing {
+  from { 
+    width: 0; 
+    border-right: 2px solid;
+  }
+  to { 
+    width: 100%;
+    border-right: 2px solid transparent;
+  }
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+.typing-animation {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: 
+    typing 3s steps(40, end),
+    blink 1s step-end infinite alternate;
+  border-right: 2px solid;
+}
+
+/* Pulse animation for shield outline */
+@keyframes pulse-outline {
+  0% {
+    opacity: 0.6;
+    stroke-width: 2;
+  }
+  50% {
+    opacity: 1;
+    stroke-width: 2.5;
+  }
+  100% {
+    opacity: 0.6;
+    stroke-width: 2;
+  }
+}
+
+.pulse-outline {
+  animation: pulse-outline 3s ease-in-out infinite;
 }
 

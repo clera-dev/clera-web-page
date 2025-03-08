@@ -7,30 +7,33 @@ export const plans = [
     href: '/waitlist',
     cta: 'Get Started',
     features: [
-      'Basic AI portfolio suggestions',
-      'Market trend analysis',
-      'Monthly investment insights',
+      'Unlimited access to commission free trading on Clera',
+      'Limit of 8 basic investment suggestion from Clera per month',
+      'Limit of 3 news articles per week',
+      'Limit of 2 stock analyses a month',
       'Email support',
-      'Mobile app access',
-      ['Up to $10,000 portfolio value', 'Great for beginners']
+      'Web-app access',
+      'Up to $10,000 in portfolio value'
     ]
   },
   {
     name: 'Plus',
     description: 'For growing investors seeking better returns',
-    priceMonthly: '10',
+    priceMonthly: '15',
     costUnit: '/month',
     href: '/waitlist',
     cta: 'Get Started',
     nameBadge: 'Most Popular',
     features: [
-      'Everything in Free, plus:',
-      'Advanced AI strategies',
-      'Real-time market insights',
+      'Everything in the Clera Free plan, plus:',
+      'Unlimited amount of access to personalized investment suggestions from Clera',
+      'Unlimited access to Clera\'s stock analysis feature',
+      'Unlimited access to news analysis on Clera',
+      'Detailed personal investment strategy',
       'Weekly portfolio rebalancing',
+      'Access to the "Call Clera" feature',
       'Priority support',
-      'Custom investment rules',
-      ['Up to $100,000 portfolio value', 'Perfect for active investors']
+      'No limit on portfolio $ value'
     ]
   },
   {
@@ -42,13 +45,13 @@ export const plans = [
     cta: 'Join Waitlist',
     nameBadge: 'Coming Soon',
     features: [
-      'Everything in Plus, plus:',
-      'Advanced portfolio AI (Coming Soon)',
-      'Custom risk models (Coming Soon)',
-      'Institutional-grade tools (Coming Soon)',
-      'VIP support access (Coming Soon)',
-      'Multi-account management (Coming Soon)',
-      ['Unlimited portfolio value', 'Built for professionals']
+      'Everything in the Clera Plus plan, plus:',
+      'Advanced trading strategies',
+      'Premium portfolio dashboard for serious investors',
+      'Institutional-grade portfolio management models',
+      'Multi-account management',
+      'VIP support access',
+      'And more coming soon...'
     ]
   }
 ] 

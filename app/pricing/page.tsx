@@ -1,21 +1,113 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Check } from 'lucide-react'
 import { plans } from '@/data/pricing'
-import Navigation from '@/components/Navigation'
-import Particles from '@/components/Particles'
-import PricingComparisonTable from '@/components/pricing/PricingComparisonTable'
+import Particles from "react-tsparticles"
+import { Container, Engine } from "tsparticles-engine"
+import { loadSlim } from "tsparticles-slim"
+
+const ParticleBackground = () => {
+  const particlesInit = useCallback(async (engine: Engine) => {
+    await loadSlim(engine);
+  }, []);
+
+  // Define the direction as a constant outside the config
+  const noneDirection = "none" as "none";
+
+  const particlesConfig = {
+    background: {
+      color: {
+        value: "transparent",
+      },
+    },
+    fpsLimit: 120,
+    particles: {
+      color: {
+        value: "#4299e1",
+      },
+      links: {
+        enable: false,
+        color: "#4299e1",
+        distance: 150,
+        opacity: 0.3,
+        width: 1,
+      },
+      move: {
+        enable: true,
+        speed: 0.8, // Reduced from 2 to 0.8 for slower movement
+        direction: noneDirection,
+        random: false,
+        straight: false,
+        outModes: {
+          default: "out" as "out"
+        },
+        attract: {
+          enable: true,
+          rotateX: 600,
+          rotateY: 1200,
+        },
+      },
+      number: {
+        density: {
+          enable: true,
+          area: 800,
+        },
+        value: 80,
+      },
+      opacity: {
+        value: 0.5,
+      },
+      shape: {
+        type: "circle",
+      },
+      size: {
+        value: { min: 1, max: 3 },
+      },
+    },
+    interactivity: {
+      events: {
+        onHover: {
+          enable: true,
+          mode: "grab",
+          parallax: {
+            enable: true,
+            force: 60,
+            smooth: 10
+          }
+        },
+        resize: true,
+      },
+      modes: {
+        grab: {
+          distance: 200,
+          links: {
+            opacity: 0,
+          },
+        },
+      },
+    },
+    detectRetina: true,
+  };
+
+  return (
+    <Particles
+      id="tsparticles"
+      init={particlesInit}
+      options={particlesConfig}
+      className="absolute inset-0 -z-10"
+    />
+  );
+};
 
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-black/50 to-[#0a0a0f]/50">
-      <Particles />
-      <Navigation />
+      <ParticleBackground />
       
-      <main className="relative z-10 pt-32 pb-16">
+      <main className="relative z-10 pt-20 pb-32">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-32">
           <h1 className="text-4xl md:text-5xl font-semibold text-white mb-4">
             Simple, transparent pricing
           </h1>
@@ -39,7 +131,7 @@ export default function PricingPage() {
               >
                 {plan.nameBadge && (
                   <div className="absolute top-4 right-4 bg-[#4299e1] text-white text-sm px-3 py-1 rounded-full">
-                    {plan.nameBadge}
+                    {plan.name === 'Plus' ? 'Recommended' : plan.nameBadge}
                   </div>
                 )}
 
@@ -65,12 +157,18 @@ export default function PricingPage() {
                       ${plan.name === 'Plus'
                         ? 'bg-[#4299e1] text-white hover:bg-[#63b3ff]'
                         : 'bg-white/10 text-white hover:bg-white/20'}`}
+                    onClick={() => {
+                      // Trigger the ContactSlideout to open
+                      const event = new CustomEvent('openWaitlistSlideout');
+                      window.dispatchEvent(event);
+                    }}
                   >
-                    {plan.cta}
+                    Join Waitlist
                   </button>
                 </div>
 
                 <div className="p-8 border-t border-white/10 flex-1">
+                  <h4 className="text-white font-medium mb-4">Included in this plan:</h4>
                   <ul className="space-y-4">
                     {plan.features.map((feature) => (
                       <li key={typeof feature === 'string' ? feature : feature[0]} className="flex">
@@ -79,9 +177,6 @@ export default function PricingPage() {
                           <p className="text-white">
                             {typeof feature === 'string' ? feature : feature[0]}
                           </p>
-                          {Array.isArray(feature) && (
-                            <p className="text-slate-400 text-sm mt-1">{feature[1]}</p>
-                          )}
                         </div>
                       </li>
                     ))}
@@ -92,8 +187,7 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* Add the comparison table */}
-        <PricingComparisonTable />
+        {/* No comparison table */}
       </main>
     </div>
   )

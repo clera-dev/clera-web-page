@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import React, { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
 
 interface ContactSlideoutProps {
   isOpen: boolean
@@ -10,123 +12,179 @@ interface ContactSlideoutProps {
 }
 
 export default function ContactSlideout({ isOpen, onClose }: ContactSlideoutProps) {
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [message, setMessage] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const formRef = useRef<HTMLFormElement>(null)
+  
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setStatus('loading')
-
-    try {
-      // TODO: Implement actual API endpoint
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setStatus('success')
+    // In a real implementation, you would send this data to your backend
+    console.log('Waitlist signup:', { name, email })
+    setIsSubmitted(true)
+    
+    // Reset form after 5 seconds for demo purposes
+    setTimeout(() => {
+      setIsSubmitted(false)
+      setName('')
       setEmail('')
-      setMessage('')
-      setTimeout(() => {
-        onClose()
-        setStatus('idle')
-      }, 2000)
-    } catch (error) {
-      setStatus('error')
-    }
+      onClose()
+    }, 5000)
   }
-
+  
+  // Close on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [onClose])
+  
+  // Focus trap
+  useEffect(() => {
+    if (isOpen && formRef.current) {
+      const focusableElements = formRef.current.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      
+      if (focusableElements.length > 0) {
+        (focusableElements[0] as HTMLElement).focus()
+      }
+    }
+  }, [isOpen])
+  
   return (
-    <>
-      {/* Backdrop */}
-      <div 
-        className={`fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 z-50
-          ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        onClick={onClose}
-      />
-
-      {/* Slideout Panel */}
-      <div 
-        className={`fixed top-0 right-0 h-full w-full max-w-md bg-[#0a0a0f] shadow-xl transform transition-transform duration-300 ease-in-out z-50
-          ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
-      >
-        <div className="h-full flex flex-col p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-semibold text-white">Contact Us</h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors"
-            >
-              <X className="w-6 h-6 text-slate-400" />
-            </button>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
-            <div className="space-y-6 flex-1">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-slate-700 
-                    text-white placeholder-slate-400 
-                    focus:outline-none focus:ring-2 focus:ring-[#4299e1]
-                    transition-all duration-200"
-                  placeholder="your@email.com"
-                  required
-                />
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black z-50"
+            onClick={onClose}
+          />
+          
+          {/* Slideout panel */}
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-gradient-to-br from-[#0a0a0f] via-[#131320] to-[#1a1a2e] border-l border-white/5 shadow-xl z-50 overflow-auto"
+          >
+            <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]"></div>
+            <div className="p-8 md:p-10 h-full flex flex-col relative">
+              <div className="flex justify-between items-center mb-8">
+                <div className="relative">
+                  <h2 className="text-2xl font-bold text-white">Join Our Waitlist</h2>
+                  <motion.div 
+                    className="absolute h-[2px] bg-[#4299e1] bottom-[-8px] left-0"
+                    initial={{ width: 0 }}
+                    animate={{ width: "100%" }}
+                    transition={{ 
+                      duration: 0.8, 
+                      ease: "easeOut",
+                      delay: 0.2
+                    }}
+                  />
+                </div>
+                <button 
+                  onClick={onClose}
+                  className="text-slate-400 hover:text-white transition-colors"
+                  aria-label="Close"
+                >
+                  <X size={24} />
+                </button>
               </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-slate-300 mb-2">
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className="w-full h-48 px-4 py-2 rounded-lg bg-white/5 border border-slate-700 
-                    text-white placeholder-slate-400 
-                    focus:outline-none focus:ring-2 focus:ring-[#4299e1]
-                    transition-all duration-200 resize-none"
-                  placeholder="How can we help you?"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <Button
-                type="submit"
-                disabled={status === 'loading'}
-                className="w-full bg-[#4299e1] text-white py-3 rounded-lg
-                  hover:bg-[#63b3ff] transition-colors duration-200
-                  disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {status === 'loading' ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Sending...</span>
-                  </div>
-                ) : status === 'success' ? (
-                  'Message Sent!'
+              
+              <AnimatePresence mode="wait">
+                {!isSubmitted ? (
+                  <motion.form 
+                    ref={formRef}
+                    key="form"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex flex-col flex-grow"
+                    onSubmit={handleSubmit}
+                  >
+                    <p className="text-slate-300 mb-8">
+                      Be among the first to experience Clera, our AI-powered financial advisor. 
+                      Sign up below for exclusive early access.
+                    </p>
+                    
+                    <div className="mb-6">
+                      <label htmlFor="name" className="block text-sm font-medium text-slate-200 mb-2">
+                        Your Name
+                      </label>
+                      <input
+                        id="name"
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full px-4 py-3 bg-[#1a1a24] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4299e1] focus:border-transparent text-white"
+                        placeholder="John Doe"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="mb-10">
+                      <label htmlFor="email" className="block text-sm font-medium text-slate-200 mb-2">
+                        Email Address
+                      </label>
+                      <input
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full px-4 py-3 bg-[#1a1a24] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4299e1] focus:border-transparent text-white"
+                        placeholder="your@email.com"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="mt-auto">
+                      <HoverBorderGradient
+                        as="button"
+                        type="submit"
+                        containerClassName="w-full rounded-xl"
+                        className="w-full text-white font-medium py-2 rounded-xl"
+                        duration={2}
+                        clockwise={true}
+                      >
+                        Join Waitlist
+                      </HoverBorderGradient>
+                    </div>
+                  </motion.form>
                 ) : (
-                  'Send Message'
+                  <motion.div
+                    key="success"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex flex-col items-center justify-center flex-grow text-center"
+                  >
+                    <div className="bg-[#4299e1]/10 rounded-full p-6 mb-6">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 6L9 17L4 12" stroke="#4299e1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-4">You're on the list!</h3>
+                    <p className="text-slate-300 mb-8">
+                      Thanks for joining our waitlist. We'll notify you as soon as early access is available.
+                    </p>
+                  </motion.div>
                 )}
-              </Button>
-
-              {status === 'error' && (
-                <p className="mt-3 text-red-400 text-sm text-center">
-                  Something went wrong. Please try again.
-                </p>
-              )}
+              </AnimatePresence>
             </div>
-          </form>
-        </div>
-      </div>
-    </>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   )
 } 
