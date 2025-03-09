@@ -8,12 +8,10 @@ export const plans = [
     cta: 'Get Started',
     features: [
       'Unlimited access to commission free trading on Clera',
-      'Limit of 8 basic investment suggestion from Clera per month',
+      'Limit of 8 basic investment suggestions from Clera per month',
       'Limit of 3 news articles per week',
       'Limit of 2 stock analyses a month',
-      'Email support',
-      'Web-app access',
-      'Up to $10,000 in portfolio value'
+      'Email support'
     ]
   },
   {
@@ -26,14 +24,13 @@ export const plans = [
     nameBadge: 'Most Popular',
     features: [
       'Everything in the Clera Free plan, plus:',
-      'Unlimited amount of access to personalized investment suggestions from Clera',
+      'Unlimited access to personalized investment suggestions from Clera',
       'Unlimited access to Clera\'s stock analysis feature',
       'Unlimited access to news analysis on Clera',
       'Detailed personal investment strategy',
       'Weekly portfolio rebalancing',
       'Access to the "Call Clera" feature',
-      'Priority support',
-      'No limit on portfolio $ value'
+      'Priority support'
     ]
   },
   {

@@ -1,21 +1,30 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Check } from 'lucide-react'
 import { plans } from '@/data/pricing'
-import Particles from "react-tsparticles"
-import { Container, Engine } from "tsparticles-engine"
-import { loadSlim } from "tsparticles-slim"
+import { Particles, initParticlesEngine } from "@tsparticles/react"
+import { type Container, type ISourceOptions, MoveDirection, OutMode } from "@tsparticles/engine"
+import { loadSlim } from "@tsparticles/slim"
 
 const ParticleBackground = () => {
-  const particlesInit = useCallback(async (engine: Engine) => {
-    await loadSlim(engine);
+  const [init, setInit] = useState(false);
+
+  // Initialize the particles engine (should be done once)
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadSlim(engine);
+    }).then(() => {
+      setInit(true);
+    });
   }, []);
 
-  // Define the direction as a constant outside the config
-  const noneDirection = "none" as "none";
+  const particlesLoaded = useCallback(async (container?: Container) => {
+    console.log("Particles container loaded", container);
+  }, []);
 
-  const particlesConfig = {
+  // Particle configuration
+  const options: ISourceOptions = {
     background: {
       color: {
         value: "transparent",
@@ -34,24 +43,26 @@ const ParticleBackground = () => {
         width: 1,
       },
       move: {
+        direction: MoveDirection.none,
         enable: true,
-        speed: 0.8, // Reduced from 2 to 0.8 for slower movement
-        direction: noneDirection,
-        random: false,
-        straight: false,
         outModes: {
-          default: "out" as "out"
+          default: OutMode.out,
         },
+        random: false,
+        speed: 0.8,
+        straight: false,
         attract: {
           enable: true,
-          rotateX: 600,
-          rotateY: 1200,
+          rotate: {
+            x: 600,
+            y: 1200
+          }
         },
       },
       number: {
         density: {
           enable: true,
-          area: 800,
+          value_area: 800,
         },
         value: 80,
       },
@@ -76,7 +87,10 @@ const ParticleBackground = () => {
             smooth: 10
           }
         },
-        resize: true,
+        resize: {
+          enable: true,
+          delay: 0
+        },
       },
       modes: {
         grab: {
@@ -88,14 +102,18 @@ const ParticleBackground = () => {
       },
     },
     detectRetina: true,
-  };
+  } as unknown as ISourceOptions; // Type assertion to bypass type checking for value_area property
+
+  if (!init) {
+    return null;
+  }
 
   return (
     <Particles
       id="tsparticles"
-      init={particlesInit}
-      options={particlesConfig}
       className="absolute inset-0 -z-10"
+      particlesLoaded={particlesLoaded}
+      options={options}
     />
   );
 };

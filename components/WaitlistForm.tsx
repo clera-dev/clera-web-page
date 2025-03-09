@@ -2,10 +2,19 @@
 
 import { useState } from 'react'
 import confetti from 'canvas-confetti'
+import supabase from '../lib/supabase'
+
+// Define the structure of our waitlist entry
+interface WaitlistEntry {
+  name: string
+  email: string
+}
 
 export default function WaitlistForm() {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
   const triggerConfetti = () => {
     // First burst
@@ -42,16 +51,61 @@ export default function WaitlistForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setStatus('loading')
+    setErrorMessage('')
 
-    // TODO: Implement actual API endpoint for waitlist
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      console.log('Submitting to Supabase:', { name, email })
+      
+      // Create a properly typed entry object
+      const waitlistEntry: WaitlistEntry = {
+        name,
+        email
+      }
+      
+      // Insert data into Supabase waitlist table with better error handling
+      // Note: We don't use .select() here as it might not be needed for inserts
+      // and could cause issues with RLS policies
+      const { data, error } = await supabase
+        .from('waitlist')
+        .insert([waitlistEntry])
+      
+      console.log('Supabase response:', { data, error })
+      
+      // Check for errors specifically 
+      if (error) {
+        console.error('Supabase error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        })
+        
+        // Handle common errors
+        if (error.code === '23505') {
+          throw new Error('This email is already on our waitlist.')
+        } else if (error.code === '42P01') {
+          throw new Error('Waitlist table not found. Please contact support.')
+        } else if (error.code === '42703') {
+          throw new Error('Invalid column in waitlist table. Please contact support.')
+        } else if (error.code === '23503') {
+          throw new Error('Database constraint violation. Please contact support.')
+        } else if (error.code?.includes('PGRST')) {
+          throw new Error('Access denied. Database permissions need to be updated.')
+        } else {
+          throw error
+        }
+      }
+
+      // If we get here, the submission was successful
+      console.log('Successfully added to waitlist:', data)
       triggerConfetti()
       setStatus('success')
+      setName('')
       setEmail('')
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error submitting to waitlist:', error)
       setStatus('error')
+      setErrorMessage(error.message || 'Something went wrong. Please try again.')
     }
   }
 
@@ -73,6 +127,23 @@ export default function WaitlistForm() {
       </p>
       
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="transform transition-transform duration-300 group-hover:translate-y-[-2px]">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your name"
+            className="w-full px-4 py-2 rounded-lg 
+              bg-white/5 border border-slate-700 
+              text-white placeholder-slate-400 
+              transition-all duration-300
+              focus:outline-none focus:ring-2 focus:ring-[#4299e1]
+              group-hover:border-[#4299e1] group-hover:bg-[#4299e1]/10
+              group-hover:placeholder-[#63b3ff]/70 mb-3"
+            required
+          />
+        </div>
+        
         <div className="transform transition-transform duration-300 group-hover:translate-y-[-2px]">
           <input
             type="email"
@@ -120,7 +191,7 @@ export default function WaitlistForm() {
         
         {status === 'error' && (
           <p className="text-red-400 text-sm text-center">
-            Something went wrong. Please try again.
+            {errorMessage || 'Something went wrong. Please try again.'}
           </p>
         )}
       </form>

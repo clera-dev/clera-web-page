@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 import dynamic from 'next/dynamic';
 import { LucideIcon } from "lucide-react";
 
-// Dynamically import the NewsGlobe component with SSR disabled
-const NewsGlobe = dynamic(() => import('./NewsGlobe').then(mod => ({ default: mod.NewsGlobe })), { 
+// Dynamically import the WorldMap component with SSR disabled
+const WorldMap = dynamic(() => import('./WorldMap'), { 
   ssr: false,
   loading: () => <div className="h-80 w-[140%] overflow-hidden rounded-lg opacity-0 absolute bottom-[-160px] left-[-20%]"></div>
 });
@@ -81,14 +81,23 @@ export const NewsCard = ({
           {description}
         </div>
         
-        {/* Spacer that pushes content up to make room for globe */}
+        {/* Spacer that pushes content up to make room for world map */}
         <div className="flex-grow"></div>
       </div>
       
-      {/* Globe background with stronger gradient overlay to ensure text readability */}
+      {/* World Map background with gradient overlay to ensure text readability */}
       <div className="absolute inset-0 w-full h-full opacity-0 group-hover/card:opacity-100 transition-opacity duration-700 ease-in-out">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#0a0a0f] to-[#0a0a0f]/20 z-[9]"></div>
-        <NewsGlobe />
+        <div className="h-80 w-[140%] overflow-hidden rounded-lg absolute bottom-[-160px] left-[-20%]">
+          <WorldMap 
+            highlightColor="#ffeb3b"
+            baseColor="#353D69"
+            backgroundColor="#0a0a15"
+            dotSize={0.4}
+            dotColor="#ffffff"
+            highlightedDotColor="#ffeb3b"
+          />
+        </div>
       </div>
     </motion.div>
   );

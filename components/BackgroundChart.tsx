@@ -4,11 +4,17 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 
 export default function BackgroundChart() {
-  const [mounted, setMounted] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   
+  // Generate points for the chart immediately (not state dependent)
+  const chartPoints = generateChartPoints()
+  
+  // Create SVG path from points immediately
+  const pathString = createSvgPath(chartPoints)
+  const areaPathString = pathString + ` L${chartPoints[chartPoints.length - 1]?.x || 0},${500} L0,${500} Z`
+  
   // Generate points for a more dynamic upward trending chart
-  const generateChartPoints = () => {
+  function generateChartPoints() {
     const points = []
     const segments = 50
     // Adjust width to match navigation container
@@ -36,7 +42,6 @@ export default function BackgroundChart() {
       let currentTrend = -0.8 // Default trend
       let currentVolatility = volatility
       
-      
       for (const change of trendChanges) {
         if (i > change.point && i < change.point + 5) {
           // In a transition zone, swing more dramatically
@@ -62,27 +67,8 @@ export default function BackgroundChart() {
     return points
   }
   
-  const [chartPoints, setChartPoints] = useState<{ x: number, y: number }[]>([])
-  
-  useEffect(() => {
-    setMounted(true)
-    setChartPoints(generateChartPoints())
-    
-    const handleResize = () => {
-      setChartPoints(generateChartPoints())
-    }
-    
-    window.addEventListener('resize', handleResize)
-    
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
-  
-  if (!mounted) return null
-  
   // Create SVG path from points
-  const createSvgPath = (points: { x: number, y: number }[]) => {
+  function createSvgPath(points: { x: number, y: number }[]) {
     if (points.length === 0) return ''
     
     let path = `M${points[0].x},${points[0].y}`
@@ -100,11 +86,19 @@ export default function BackgroundChart() {
     return path
   }
   
-  const pathString = createSvgPath(chartPoints)
-  
-  // Create area under the path
-  const areaPathString = pathString + 
-    ` L${chartPoints[chartPoints.length - 1].x},${500} L0,${500} Z`
+  // Handle window resize without state changes
+  useEffect(() => {
+    function handleResize() {
+      // Just trigger a re-render, no state changes that might interrupt animations
+      containerRef.current?.classList.add('resized')
+      setTimeout(() => {
+        containerRef.current?.classList.remove('resized')
+      }, 0)
+    }
+    
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
   
   return (
     <div 
@@ -148,32 +142,31 @@ export default function BackgroundChart() {
           />
         ))}
         
-        {/* Area under the chart - slower animation */}
+        {/* Area under the chart - simple, linear animation */}
         <motion.path
           d={areaPathString}
           fill="url(#gradient)"
-          opacity="0.5"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 0.5 }}
-          transition={{ duration: 4, ease: "easeInOut" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.5 }}
+          transition={{ duration: 2, ease: "linear" }}
         />
         
-        {/* The chart line - slower animation */}
+        {/* The chart line path - use simple, linear animation for smoothness */}
         <motion.path
           d={pathString}
           fill="none"
           stroke="#4299e1"
           strokeWidth="2"
           strokeLinecap="round"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 2.5, ease: "linear" }}
           style={{
             filter: 'drop-shadow(0 0 8px rgba(66, 153, 225, 0.5))'
           }}
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 4, ease: "easeInOut" }}
         />
         
-        {/* Interactive data points - adjusted delay to match new duration */}
+        {/* Interactive data points - appear sequentially */}
         {chartPoints.filter((_, i) => i % 5 === 0).map((point, i) => (
           <motion.circle
             key={`point-${i}`}
@@ -184,11 +177,11 @@ export default function BackgroundChart() {
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ 
-              delay: 4 + i * 0.15,
-              duration: 0.5
+              delay: 1.5 + (i * 0.05),
+              duration: 0.3,
+              ease: "easeOut"
             }}
             style={{
-              transformOrigin: 'center center',
               filter: 'drop-shadow(0 0 6px rgba(66, 153, 225, 0.8))'
             }}
           />

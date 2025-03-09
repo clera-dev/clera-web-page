@@ -5,6 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
+import supabase from '../lib/supabase'
+import confetti from 'canvas-confetti'
+
+// Define the structure of our waitlist entry
+interface WaitlistEntry {
+  name: string
+  email: string
+  created_at?: string // Optional as Supabase can add this automatically
+}
 
 interface ContactSlideoutProps {
   isOpen: boolean
@@ -15,22 +24,102 @@ export default function ContactSlideout({ isOpen, onClose }: ContactSlideoutProp
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
   const formRef = useRef<HTMLFormElement>(null)
   
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // In a real implementation, you would send this data to your backend
-    console.log('Waitlist signup:', { name, email })
-    setIsSubmitted(true)
-    
-    // Reset form after 5 seconds for demo purposes
+  const triggerConfetti = () => {
+    // First burst
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#4299e1', '#63b3ff', '#fff'],
+    })
+
+    // Second burst with slight delay
     setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ['#4299e1', '#63b3ff', '#fff'],
+      })
+    }, 200)
+  }
+  
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // Prevent multiple submissions
+    if (status === 'loading') return
+    
+    setStatus('loading')
+    setErrorMessage('')
+    
+    try {
+      console.log('Waitlist signup:', { name, email })
+      
+      // Create a properly typed entry object
+      const waitlistEntry: WaitlistEntry = {
+        name,
+        email
+      }
+      
+      // Insert data into Supabase waitlist table
+      const { data, error } = await supabase
+        .from('waitlist')
+        .insert(waitlistEntry)
+      
+      console.log('Supabase response:', { data, error })
+      
+      // Check for errors specifically 
+      if (error) {
+        console.error('Supabase error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        })
+        
+        // Handle common errors
+        if (error.code === '23505') {
+          throw new Error('This email is already on our waitlist.')
+        } else if (error.code === '42P01') {
+          throw new Error('Waitlist table not found. Please contact support.')
+        } else if (error.code === '42703') {
+          throw new Error('Invalid column in waitlist table. Please contact support.')
+        } else if (error.code === '23503') {
+          throw new Error('Database constraint violation. Please contact support.')
+        } else if (error.code?.includes('PGRST')) {
+          throw new Error('Access denied. Database permissions need to be updated.')
+        } else {
+          throw error
+        }
+      }
+      
+      // If we get here, the submission was successful
+      console.log('Successfully added to waitlist:', data)
+      triggerConfetti()
+      setIsSubmitted(true)
+      setStatus('success')
+      
+      // Reset form after 5 seconds and close the slideout
+      setTimeout(() => {
+        setIsSubmitted(false)
+        setName('')
+        setEmail('')
+        onClose()
+      }, 5000)
+    } catch (error: any) {
+      console.error('Error submitting to waitlist:', error)
+      setStatus('error')
+      setErrorMessage(error.message || 'Something went wrong. Please try again.')
+      // Still show as submitted but with error message
       setIsSubmitted(false)
-      setName('')
-      setEmail('')
-      onClose()
-    }, 5000)
+    }
   }
   
   // Close on escape key
@@ -130,6 +219,7 @@ export default function ContactSlideout({ isOpen, onClose }: ContactSlideoutProp
                         className="w-full px-4 py-3 bg-[#1a1a24] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4299e1] focus:border-transparent text-white"
                         placeholder="John Doe"
                         required
+                        disabled={status === 'loading'}
                       />
                     </div>
                     
@@ -145,19 +235,36 @@ export default function ContactSlideout({ isOpen, onClose }: ContactSlideoutProp
                         className="w-full px-4 py-3 bg-[#1a1a24] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4299e1] focus:border-transparent text-white"
                         placeholder="your@email.com"
                         required
+                        disabled={status === 'loading'}
                       />
                     </div>
+                    
+                    {status === 'error' && (
+                      <div className="mb-4">
+                        <p className="text-red-400 text-sm">
+                          {errorMessage || 'Something went wrong. Please try again.'}
+                        </p>
+                      </div>
+                    )}
                     
                     <div className="mt-auto">
                       <HoverBorderGradient
                         as="button"
                         type="submit"
                         containerClassName="w-full rounded-xl"
-                        className="w-full text-white font-medium py-2 rounded-xl"
+                        className={`w-full text-white font-medium py-2 rounded-xl ${status === 'loading' ? 'opacity-70' : ''}`}
                         duration={2}
                         clockwise={true}
+                        {...(status === 'loading' ? { 'aria-disabled': 'true' } : {})}
                       >
-                        Join Waitlist
+                        {status === 'loading' ? (
+                          <div className="flex items-center justify-center space-x-2">
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <span>Submitting...</span>
+                          </div>
+                        ) : (
+                          'Submit'
+                        )}
                       </HoverBorderGradient>
                     </div>
                   </motion.form>

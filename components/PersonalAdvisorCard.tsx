@@ -25,6 +25,17 @@ export const PersonalAdvisorCard = ({
   const [isConversationComplete, setIsConversationComplete] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
+  // State for client-side only particles
+  const [particles, setParticles] = useState<Array<{
+    id: number;
+    x: number;
+    y: number;
+    size: number;
+    opacity: number;
+    hoverOffset: number;
+    hoverDuration: number;
+  }>>([]);
+  
   // Simulate a conversation about technology stocks
   const conversation = [
     {
@@ -81,7 +92,14 @@ export const PersonalAdvisorCard = ({
     }));
   };
   
-  const [particles] = useState(generateParticles(80));
+  // Only generate particles on the client side
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Initialize particles only on client side
+  useEffect(() => {
+    setIsMounted(true);
+    setParticles(generateParticles(80));
+  }, []);
 
   // Function to determine if a message should be shown
   const shouldShowMessage = (messageIndex: number) => {
@@ -160,31 +178,33 @@ export const PersonalAdvisorCard = ({
       >
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#0a0a0f] to-[#0a0a0f]/20 z-[9]"></div>
         
-        {/* Particles in the background */}
-        <div className="absolute inset-0 overflow-hidden">
-          {particles.map((particle) => (
-            <motion.div
-              key={particle.id}
-              className="absolute rounded-full bg-blue-400"
-              style={{
-                left: `${particle.x}%`,
-                top: `${particle.y}%`,
-                width: `${particle.size}px`,
-                height: `${particle.size}px`,
-                opacity: particle.opacity,
-              }}
-              animate={{
-                y: [0, -particle.hoverOffset, 0, particle.hoverOffset, 0],
-              }}
-              transition={{
-                duration: particle.hoverDuration,
-                repeat: Infinity,
-                ease: "easeInOut",
-                repeatType: "mirror"
-              }}
-            />
-          ))}
-        </div>
+        {/* Particles in the background - only render when mounted (client-side) */}
+        {isMounted && (
+          <div className="absolute inset-0 overflow-hidden">
+            {particles.map((particle) => (
+              <motion.div
+                key={particle.id}
+                className="absolute rounded-full bg-blue-400"
+                style={{
+                  left: `${particle.x}%`,
+                  top: `${particle.y}%`,
+                  width: `${particle.size}px`,
+                  height: `${particle.size}px`,
+                  opacity: particle.opacity,
+                }}
+                animate={{
+                  y: [0, -particle.hoverOffset, 0, particle.hoverOffset, 0],
+                }}
+                transition={{
+                  duration: particle.hoverDuration,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  repeatType: "mirror"
+                }}
+              />
+            ))}
+          </div>
+        )}
         
         {/* Chat Interface that matches the image - with adjusted height and overflow handling */}
         <div className="absolute bottom-0 left-0 right-0 w-full max-w-full h-[400px] flex flex-col justify-between p-4 z-[10] mt-[120px] overflow-x-hidden">

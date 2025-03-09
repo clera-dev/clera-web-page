@@ -22,8 +22,6 @@ const FeatureIcon = ({ IconComponent, isLarge = false }: { IconComponent: Lucide
 };
 
 export default function Home() {
-  const [showDescription, setShowDescription] = useState(false)
-  const [chartProgress, setChartProgress] = useState(0)
   const containerRef = useRef(null)
   const { scrollYProgress } = useScroll({ 
     target: containerRef,
@@ -32,17 +30,6 @@ export default function Home() {
   
   // Transform scroll progress to line height
   const lineHeight = useTransform(scrollYProgress, [0, 0.3], ["0%", "100%"])
-
-  useEffect(() => {
-    // Start chart animation immediately
-    setChartProgress(1)
-    // Show description after a longer delay
-    const timer = setTimeout(() => {
-      setShowDescription(true)
-    }, 1200)
-
-    return () => clearTimeout(timer)
-  }, [])
 
   return (
     <>
@@ -76,21 +63,24 @@ export default function Home() {
           <div className="text-left mb-96">            
             <motion.h2 
               className="text-5xl md:text-7xl font-semibold text-white mb-6"
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.8, 
+                ease: [0.25, 0.1, 0.25, 1],
+              }}
             >
               Meet <span className="text-[#4299e1]">Clera</span>, Your <span className="italic">Personal</span> AI Financial Advisor.
             </motion.h2>
             
             <motion.p 
               className="text-xl md:text-2xl text-slate-300 max-w-2xl mb-8"
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ 
-                duration: 1.5,
-                ease: "easeOut", 
-                delay: 0.4
+                duration: 0.8,
+                ease: [0.25, 0.1, 0.25, 1], 
+                delay: 0.3
               }}
             >
               Investing made simple: Clera delivers personalized, Wall Street-level advice and manages your investments—all for one low, affordable monthly price.
@@ -101,8 +91,8 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ 
                 duration: 0.8,
-                ease: "easeOut", 
-                delay: 0.8
+                ease: [0.25, 0.1, 0.25, 1], 
+                delay: 0.6
               }}
             >
               <Button 
