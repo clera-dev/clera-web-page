@@ -8,6 +8,12 @@
   --background-end-rgb: 10, 10, 15;
 }
 
+html {
+  background-color: rgb(var(--background-start-rgb));
+  overscroll-behavior: none; /* Prevents bounce effect in some browsers */
+  height: 100%;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
@@ -17,6 +23,7 @@ body {
   );
   min-height: 100vh;
   overflow-y: auto;
+  overscroll-behavior-y: none; /* Prevents bounce effect in modern browsers */
 }
 
 @layer base {
