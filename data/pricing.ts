@@ -37,7 +37,7 @@ export const plans = [
     name: 'Pro',
     description: 'Our most powerful features - Coming Soon',
     priceMonthly: 'TBA',
-    costUnit: '',
+    costUnit: '/month',
     href: '/waitlist',
     cta: 'Join Waitlist',
     nameBadge: 'Coming Soon',

@@ -162,9 +162,9 @@ export default function PricingPage() {
                       <span className="text-4xl font-bold text-white">$</span>
                     )}
                     <span className="text-5xl font-bold text-white">
-                      {plan.priceMonthly === '0' ? 'Free' : plan.priceMonthly}
+                      {plan.priceMonthly === '0' ? '$0' : plan.priceMonthly}
                     </span>
-                    {plan.priceMonthly !== '0' && (
+                    {(//plan.priceMonthly !== '4' && (
                       <span className="ml-2 text-slate-300">{plan.costUnit}</span>
                     )}
                   </div>
