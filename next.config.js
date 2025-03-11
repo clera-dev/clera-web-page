@@ -12,8 +12,6 @@ const nextConfig = {
       },
     ],
   },
-  // Enable SWC minification for better performance
-  swcMinify: true,
   // Configure webpack for missing modules
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     // Add fallback resolvers for Babel helpers

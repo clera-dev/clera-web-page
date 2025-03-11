@@ -8,6 +8,7 @@ import { plans } from '@/data/pricing'
 const ParticleBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [isInitialized, setIsInitialized] = useState(false);
   
   // Update the type definition to include all properties
   type Particle = {
@@ -27,13 +28,41 @@ const ParticleBackground = () => {
   const particlesRef = useRef<Particle[]>([]);
   const mousePositionRef = useRef({ x: 0, y: 0 });
   const animationFrameRef = useRef<number>(0);
+  const isMobileRef = useRef<boolean>(false);
+
+  // Calculate responsive particle count and adjust properties based on screen size
+  const getResponsiveParticleSettings = useCallback(() => {
+    const isMobile = window.innerWidth < 768;
+    isMobileRef.current = isMobile;
+    
+    // Adjust particle count based on screen size
+    const baseCount = isMobile ? 80 : 120;
+    
+    // Adjust wobble and speed factors for different screen sizes
+    const speedFactor = isMobile ? 0.3 : 0.5;
+    const wobbleSpeedBase = isMobile ? 0.04 : 0.05;
+    const wobbleFactorBase = isMobile ? 2 : 3;
+    
+    return {
+      count: baseCount,
+      speedFactor,
+      wobbleSpeedBase,
+      wobbleFactorBase
+    };
+  }, []);
 
   // Initialize particles
   const initParticles = useCallback(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    const width = canvas.width;
-    const height = canvas.height;
+    
+    // Get display dimensions rather than canvas dimensions
+    // This ensures we're working with the visible area
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    
+    // Get responsive settings
+    const { count, speedFactor, wobbleSpeedBase, wobbleFactorBase } = getResponsiveParticleSettings();
     
     // Array of blue colors for variety
     const blueColors = [
@@ -45,18 +74,18 @@ const ParticleBackground = () => {
     ];
     
     // Create particles with minimal speed for a suspended effect
-    particlesRef.current = Array.from({ length: 120 }, () => ({
+    particlesRef.current = Array.from({ length: count }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
       radius: Math.random() * 2 + 0.8,
-      // Much stronger movement
-      speedX: (Math.random() - 0.5) * 0.5,  // More than 3x previous speed
-      speedY: (Math.random() - 0.5) * 0.5,  // More than 3x previous speed
+      // Adjusted movement speed
+      speedX: (Math.random() - 0.5) * speedFactor,
+      speedY: (Math.random() - 0.5) * speedFactor,
       // Add properties for the floating effect
       originalX: 0,
       originalY: 0,
-      wobbleSpeed: Math.random() * 0.05 + 0.03, // Much faster wobble
-      wobbleFactor: Math.random() * 6 + 3,      // Much stronger wobble
+      wobbleSpeed: Math.random() * wobbleSpeedBase + 0.03,
+      wobbleFactor: Math.random() * wobbleFactorBase + wobbleFactorBase,
       wobbleOffset: Math.random() * Math.PI * 2, // Random starting point in the sin wave
       color: blueColors[Math.floor(Math.random() * blueColors.length)]
     }));
@@ -66,29 +95,122 @@ const ParticleBackground = () => {
       particle.originalX = particle.x;
       particle.originalY = particle.y;
     });
-  }, []);
+    
+    setIsInitialized(true);
+  }, [getResponsiveParticleSettings]);
+
+  // Setup canvas and initial dimensions
+  useEffect(() => {
+    const setupCanvas = () => {
+      if (!canvasRef.current) return;
+      const canvas = canvasRef.current;
+      const parent = canvas.parentElement;
+      
+      if (parent) {
+        // Use device pixel ratio for sharp rendering on high-DPI screens
+        const dpr = window.devicePixelRatio || 1;
+        
+        // Set dimensions based on parent element
+        const displayWidth = parent.clientWidth;
+        const displayHeight = parent.clientHeight;
+        
+        // Set the canvas size
+        canvas.width = displayWidth * dpr;
+        canvas.height = displayHeight * dpr;
+        
+        // Set CSS dimensions separately from canvas dimensions
+        canvas.style.width = `${displayWidth}px`;
+        canvas.style.height = `${displayHeight}px`;
+        
+        // Scale the drawing context by the device pixel ratio
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.scale(dpr, dpr);
+        }
+        
+        // Update dimensions state
+        setDimensions({
+          width: displayWidth,
+          height: displayHeight
+        });
+        
+        // Initialize particles
+        initParticles();
+      }
+    };
+
+    // Run setup on mount with a small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      setupCanvas();
+    }, 50);
+    
+    return () => clearTimeout(timer);
+  }, [initParticles]);
 
   // Handle resize
   useEffect(() => {
+    if (!isInitialized) return;
+
     const handleResize = () => {
       if (!canvasRef.current) return;
       const canvas = canvasRef.current;
       const parent = canvas.parentElement;
       
       if (parent) {
-        canvas.width = parent.clientWidth;
-        canvas.height = parent.clientHeight;
+        // Use device pixel ratio for sharp rendering on high-DPI screens
+        const dpr = window.devicePixelRatio || 1;
+        
+        // Get the new dimensions
+        const newWidth = parent.clientWidth;
+        const newHeight = parent.clientHeight;
+        
+        // Update canvas dimensions
+        canvas.width = newWidth * dpr;
+        canvas.height = newHeight * dpr;
+        
+        // Set CSS dimensions
+        canvas.style.width = `${newWidth}px`;
+        canvas.style.height = `${newHeight}px`;
+        
+        // Scale the context
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.scale(dpr, dpr);
+        }
+        
+        // Check if we've changed between mobile/desktop
+        const wasMobile = isMobileRef.current;
+        const isMobileNow = window.innerWidth < 768;
+        
+        // Update dimensions state
         setDimensions({
-          width: parent.clientWidth,
-          height: parent.clientHeight
+          width: newWidth,
+          height: newHeight
         });
-        initParticles();
+        
+        if (wasMobile !== isMobileNow || particlesRef.current.length === 0) {
+          // Reinitialize particles on mobile/desktop switch
+          initParticles();
+        } else {
+          // Just reposition existing particles to fit new dimensions
+          repositionParticles(newWidth, newHeight);
+        }
       }
     };
-
-    // Set initial dimensions
-    handleResize();
     
+    // Helper to reposition particles when canvas size changes
+    const repositionParticles = (newWidth: number, newHeight: number) => {
+      if (particlesRef.current.length === 0) return;
+      
+      particlesRef.current.forEach(particle => {
+        // Keep relative position but scale to new canvas size
+        particle.originalX = (particle.originalX / dimensions.width) * newWidth;
+        particle.originalY = (particle.originalY / dimensions.height) * newHeight;
+        particle.x = particle.originalX;
+        particle.y = particle.originalY;
+      });
+    };
+
     // Add resize listener
     window.addEventListener('resize', handleResize);
     
@@ -103,18 +225,30 @@ const ParticleBackground = () => {
       }
     };
     
+    // Handle touch events for mobile
+    const handleTouchMove = (e: TouchEvent) => {
+      if (canvasRef.current && e.touches.length > 0) {
+        const rect = canvasRef.current.getBoundingClientRect();
+        mousePositionRef.current = {
+          x: e.touches[0].clientX - rect.left,
+          y: e.touches[0].clientY - rect.top
+        };
+      }
+    };
+    
     document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('touchmove', handleTouchMove);
     
     return () => {
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(animationFrameRef.current);
+      document.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [initParticles]);
+  }, [dimensions.width, dimensions.height, initParticles, isInitialized]);
 
   // Animation loop
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || !isInitialized) return;
     
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -128,7 +262,13 @@ const ParticleBackground = () => {
     
     const animate = () => {
       if (!ctx || !canvas) return;
-      animationTime += 0.025; // Much faster animation speed
+      
+      // Get the correct dimensions for clearing (accounting for device pixel ratio)
+      const dpr = window.devicePixelRatio || 1;
+      const displayWidth = canvas.clientWidth;
+      const displayHeight = canvas.clientHeight;
+      
+      animationTime += 0.025; // Animation speed
       
       // Calculate mouse movement speed/direction
       const currentMouseX = mousePositionRef.current.x;
@@ -138,8 +278,8 @@ const ParticleBackground = () => {
       prevMouseX = currentMouseX;
       prevMouseY = currentMouseY;
       
-      // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Clear canvas with display dimensions (not canvas dimensions which include DPR)
+      ctx.clearRect(0, 0, displayWidth, displayHeight);
       
       // Update and draw particles
       particlesRef.current.forEach(particle => {
@@ -193,12 +333,12 @@ const ParticleBackground = () => {
         particle.originalY += particle.speedY * 1.2;
         
         // Keep particles within bounds with more energetic bouncing
-        if (particle.originalX < 0 || particle.originalX > canvas.width) {
+        if (particle.originalX < 0 || particle.originalX > displayWidth) {
           particle.speedX *= -1;
           particle.originalX += particle.speedX * 5; // More energetic bounce
         }
         
-        if (particle.originalY < 0 || particle.originalY > canvas.height) {
+        if (particle.originalY < 0 || particle.originalY > displayHeight) {
           particle.speedY *= -1;
           particle.originalY += particle.speedY * 5; // More energetic bounce
         }
@@ -223,7 +363,7 @@ const ParticleBackground = () => {
     return () => {
       cancelAnimationFrame(animationFrameRef.current);
     };
-  }, [dimensions]);
+  }, [isInitialized]);
 
   return (
     <canvas

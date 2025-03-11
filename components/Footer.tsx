@@ -4,8 +4,8 @@ import Logo from './Logo'
 export default function Footer() {
   return (
     <footer className="bg-black border-t border-white/10">
-      <div className="relative mx-auto max-w-7xl px-6 py-12 sm:px-6 lg:px-8 lg:pt-16">
-        <div className="absolute end-4 top-24 sm:end-6 sm:top-24 lg:end-8 lg:top-24">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:pt-16">
+        <div className="absolute end-4 top-4 sm:end-6 sm:top-24 lg:end-8 lg:top-24">
           <a
             className="inline-flex items-center rounded-full bg-transparent border border-white/50 px-3 py-1 text-xs text-white shadow-sm transition hover:border-white hover:bg-white/10"
             href="#top"
@@ -29,14 +29,14 @@ export default function Footer() {
         <div className="lg:flex lg:items-end lg:justify-between">
           <div>
             <div className="flex justify-center lg:justify-start -ml-4">
-              <div className="transform scale-[0.7]">
+              <div className="transform scale-[0.6] sm:scale-[0.7] ml-3 lg:ml-5">
                 <Link href="/">
                   <Logo />
                 </Link>
               </div>
             </div>
 
-            <p className="mx-auto mt-6 max-w-md text-center text-sm leading-relaxed text-slate-300 lg:text-left lg:ml-3">
+            <p className="mx-auto mt-4 sm:mt-6 max-w-md text-center text-xs sm:text-sm leading-relaxed text-slate-300 lg:text-left lg:ml-3">
               Get personalized investment advice powered by AI and industry-grade analytics.
               Professional portfolio management at a fraction of traditional costs.
             </p>
@@ -90,12 +90,12 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="mt-12 lg:mt-0">
+          <div className="mt-8 lg:mt-0">
             <div className="flex flex-col items-center lg:items-end">
-              <h3 className="text-slate-200 font-medium text-sm mb-2">Contact Us</h3>
+              <h3 className="text-slate-200 font-medium text-xs sm:text-sm mb-2">Contact Us</h3>
               <a 
                 href="mailto:support@askclera.com" 
-                className="flex items-center text-slate-300 text-sm transition hover:text-[#4299e1]"
+                className="flex items-center text-slate-300 text-xs sm:text-sm transition hover:text-[#4299e1]"
               >
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
@@ -118,7 +118,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <p className="mt-8 text-center text-xs text-slate-400 lg:text-right">
+        <p className="mt-6 sm:mt-8 text-center text-[10px] sm:text-xs text-slate-400 lg:text-right">
           Copyright &copy; {new Date().getFullYear()} Clera. All rights reserved.
         </p>
       </div>

@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import { Toaster } from "sonner"
 import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
+import JsonLd from "./schema"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -17,11 +18,48 @@ export const viewport = {
 
 // Add metadata for the site, including favicon
 export const metadata = {
-  title: 'Clera',
-  description: 'Clera - AI assistant for your business',
+  metadataBase: new URL('https://askclera.com'),
+  title: 'Clera | Your Personal AI Financial Advisor',
+  description: 'Clera delivers personalized, Wall Street-level investment advice and management powered by AI. Get expert financial guidance at an affordable monthly price.',
+  keywords: 'Clera, askclera, AI financial advisor, investment management, financial technology, AI investing, personal finance, financial planning, wealth management, investment portfolio, automated investing',
+  openGraph: {
+    title: 'Clera | Your Personal AI Financial Advisor',
+    description: 'Get personalized, AI-powered investment advice and portfolio management at an affordable price',
+    url: 'https://askclera.com',
+    siteName: 'Clera',
+    images: [
+      {
+        url: '/clera-og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Clera - AI Financial Advisor',
+      }
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Clera | AI-Powered Financial Advisor',
+    description: 'Smart investing made simple with personalized AI financial advice',
+    images: ['/clera-og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   icons: {
-    icon: '/clera-circle.png',
-    apple: '/clera-circle.png',
+    icon: '/clera-favicon.png',
+    apple: '/clera-favicon.png',
+  },
+  alternates: {
+    canonical: 'https://askclera.com',
   },
 }
 
@@ -38,6 +76,7 @@ export default function RootLayout({
         {children}
         <Footer />
         <Toaster />
+        <JsonLd />
       </body>
     </html>
   )

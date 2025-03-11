@@ -6,6 +6,21 @@ import { motion } from 'framer-motion'
 export default function BackgroundChart() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  
+  // Check if we're on a mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    // Run on initial render
+    checkMobile()
+    
+    // Listen for resize events
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
   
   // Generate points for the chart immediately (not state dependent)
   const chartPoints = generateChartPoints()
@@ -17,7 +32,8 @@ export default function BackgroundChart() {
   // Generate points for a more dynamic upward trending chart
   function generateChartPoints() {
     const points = []
-    const segments = 50
+    // Reduce segments on mobile for better performance
+    const segments = isMobile ? 25 : 50
     // Adjust width to match navigation container
     const width = 1400 
     const height = 500
@@ -25,15 +41,15 @@ export default function BackgroundChart() {
     
     // Start at the bottom left
     let prevY = height * 0.8
-    let volatility = 0.4
+    let volatility = isMobile ? 0.3 : 0.4
     
     // Define key change points for trend direction changes
     const trendChanges = [
-      { point: Math.floor(segments * 0.2), volatility: 0.5, trend: -1.2 },
-      { point: Math.floor(segments * 0.35), volatility: 0.7, trend: -0.8 },
-      { point: Math.floor(segments * 0.5), volatility: 0.6, trend: -1.5 },
-      { point: Math.floor(segments * 0.65), volatility: 0.9, trend: 0.7 }, // Small downward correction
-      { point: Math.floor(segments * 0.8), volatility: 0.7, trend: -1.3 },
+      { point: Math.floor(segments * 0.2), volatility: isMobile ? 0.4 : 0.5, trend: -1.2 },
+      { point: Math.floor(segments * 0.35), volatility: isMobile ? 0.5 : 0.7, trend: -0.8 },
+      { point: Math.floor(segments * 0.5), volatility: isMobile ? 0.4 : 0.6, trend: -1.5 },
+      { point: Math.floor(segments * 0.65), volatility: isMobile ? 0.6 : 0.9, trend: 0.7 }, // Small downward correction
+      { point: Math.floor(segments * 0.8), volatility: isMobile ? 0.5 : 0.7, trend: -1.3 },
     ]
     
     for (let i = 0; i <= segments; i++) {
@@ -75,13 +91,18 @@ export default function BackgroundChart() {
     let path = `M${points[0].x},${points[0].y}`
     
     for (let i = 1; i < points.length; i++) {
-      // Use bezier curves for smoother lines
-      const controlX1 = points[i - 1].x + (points[i].x - points[i - 1].x) / 3
-      const controlY1 = points[i - 1].y
-      const controlX2 = points[i].x - (points[i].x - points[i - 1].x) / 3
-      const controlY2 = points[i].y
-      
-      path += ` C${controlX1},${controlY1} ${controlX2},${controlY2} ${points[i].x},${points[i].y}`
+      // Use simpler lines for mobile to improve performance
+      if (isMobile) {
+        path += ` L${points[i].x},${points[i].y}`
+      } else {
+        // Use bezier curves for smoother lines on desktop
+        const controlX1 = points[i - 1].x + (points[i].x - points[i - 1].x) / 3
+        const controlY1 = points[i - 1].y
+        const controlX2 = points[i].x - (points[i].x - points[i - 1].x) / 3
+        const controlY2 = points[i].y
+        
+        path += ` C${controlX1},${controlY1} ${controlX2},${controlY2} ${points[i].x},${points[i].y}`
+      }
     }
     
     return path
@@ -115,7 +136,7 @@ export default function BackgroundChart() {
   return (
     <div 
       ref={containerRef}
-      className="absolute top-56 left-1/2 transform -translate-x-1/2 w-full max-w-[1400px] h-[700px] z-0 pointer-events-none px-8 sm:px-12 md:px-16 lg:px-24"
+      className="absolute top-56 left-1/2 transform -translate-x-1/2 w-full max-w-[1400px] h-[700px] z-0 pointer-events-none px-4 sm:px-8 md:px-16 lg:px-24"
     >
       <svg 
         width="100%" 
@@ -124,33 +145,33 @@ export default function BackgroundChart() {
         preserveAspectRatio="xMidYMid meet"
         className="opacity-70"
       >
-        {/* Horizontal grid lines */}
-        {Array.from({ length: 10 }).map((_, i) => (
+        {/* Horizontal grid lines - reduced for mobile */}
+        {Array.from({ length: isMobile ? 5 : 10 }).map((_, i) => (
           <line 
             key={`grid-h-${i}`}
             x1="0" 
-            y1={i * 50} 
+            y1={i * (isMobile ? 100 : 50)} 
             x2="1400" 
-            y2={i * 50} 
+            y2={i * (isMobile ? 100 : 50)} 
             stroke="#4299e1" 
             strokeWidth="0.3" 
             strokeDasharray="5,5" 
-            opacity="0.5"
+            opacity={isMobile ? "0.3" : "0.5"}
           />
         ))}
         
-        {/* Vertical grid lines - adjusted for new width */}
-        {Array.from({ length: 28 }).map((_, i) => (
+        {/* Vertical grid lines - reduced for mobile */}
+        {Array.from({ length: isMobile ? 14 : 28 }).map((_, i) => (
           <line 
             key={`grid-v-${i}`}
-            x1={`${i * 50}`} 
+            x1={`${i * (isMobile ? 100 : 50)}`} 
             y1="0" 
-            x2={`${i * 50}`} 
+            x2={`${i * (isMobile ? 100 : 50)}`} 
             y2="500" 
             stroke="#4299e1" 
             strokeWidth="0.3" 
             strokeDasharray="5,5" 
-            opacity="0.5"
+            opacity={isMobile ? "0.3" : "0.5"}
           />
         ))}
         
@@ -159,8 +180,8 @@ export default function BackgroundChart() {
           d={areaPathString}
           fill="url(#gradient)"
           initial={{ opacity: 0 }}
-          animate={{ opacity: isLoaded ? 0.5 : 0 }}
-          transition={{ duration: 2, ease: "linear" }}
+          animate={{ opacity: isLoaded ? (isMobile ? 0.3 : 0.5) : 0 }}
+          transition={{ duration: isMobile ? 1.5 : 2, ease: "linear" }}
         />
         
         {/* Add clipPath definition for the animation */}
@@ -172,7 +193,7 @@ export default function BackgroundChart() {
               initial={{ width: 0 }}
               animate={{ width: isLoaded ? 1400 : 0 }}
               transition={{ 
-                duration: 2.5, 
+                duration: isMobile ? 2 : 2.5, 
                 ease: "easeInOut",
                 delay: 0.2
               }}
@@ -183,7 +204,7 @@ export default function BackgroundChart() {
           
           {/* Gradients */}
           <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#4299e1" stopOpacity="0.9" />
+            <stop offset="0%" stopColor="#4299e1" stopOpacity={isMobile ? "0.7" : "0.9"} />
             <stop offset="100%" stopColor="#4299e1" stopOpacity="0.2" />
           </linearGradient>
         </defs>
@@ -194,10 +215,12 @@ export default function BackgroundChart() {
             d={pathString}
             fill="none"
             stroke="#4299e1"
-            strokeWidth="2"
+            strokeWidth={isMobile ? "1.5" : "2"}
             strokeLinecap="round"
             style={{
-              filter: 'drop-shadow(0 0 8px rgba(66, 153, 225, 0.5))'
+              filter: isMobile ? 
+                'drop-shadow(0 0 4px rgba(66, 153, 225, 0.4))' : 
+                'drop-shadow(0 0 8px rgba(66, 153, 225, 0.5))'
             }}
           />
           

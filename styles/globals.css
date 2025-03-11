@@ -6,12 +6,15 @@
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 0, 0, 0;
   --background-end-rgb: 10, 10, 15;
+  --tap-highlight-color: transparent;
 }
 
 html {
   background-color: rgb(var(--background-start-rgb));
   overscroll-behavior: none; /* Prevents bounce effect in some browsers */
   height: 100%;
+  -webkit-tap-highlight-color: var(--tap-highlight-color);
+  touch-action: manipulation; /* Prevents delays on touch events */
 }
 
 body {
@@ -24,6 +27,44 @@ body {
   min-height: 100vh;
   overflow-y: auto;
   overscroll-behavior-y: none; /* Prevents bounce effect in modern browsers */
+}
+
+/* Improve mobile form inputs */
+input, 
+select, 
+textarea {
+  font-size: 16px !important; /* Prevents iOS zoom on focus */
+}
+
+/* Add explicit touch feedback for buttons and links */
+@media (hover: none) {
+  a:active, button:active {
+    opacity: 0.7;
+    transition: opacity 0.1s ease;
+  }
+  
+  .mobile-touch-feedback:active {
+    transform: scale(0.98);
+    opacity: 0.8;
+    transition: transform 0.1s ease, opacity 0.1s ease;
+  }
+}
+
+/* Increase touch target size for small interactive elements */
+.touch-target {
+  position: relative;
+}
+
+.touch-target::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  min-width: 100%;
+  min-height: 100%;
 }
 
 @layer base {

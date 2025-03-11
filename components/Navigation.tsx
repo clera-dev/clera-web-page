@@ -6,12 +6,14 @@ import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import Logo from './Logo'
 import ContactSlideout from './ContactSlideout'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Menu, X, ChevronRight } from 'lucide-react'
 
 export default function Navigation() {
   const pathname = usePathname()
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   // Add scroll event listener
   useEffect(() => {
@@ -28,6 +30,11 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Close mobile menu on navigation
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [pathname])
+
   // Listen for custom event to open waitlist slideout
   useEffect(() => {
     const handleOpenWaitlist = () => {
@@ -38,10 +45,51 @@ export default function Navigation() {
     return () => window.removeEventListener('openWaitlistSlideout', handleOpenWaitlist)
   }, [])
 
+  // Close mobile menu on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsMobileMenuOpen(false)
+    }
+    
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [])
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.classList.add('overflow-hidden')
+    } else {
+      document.body.classList.remove('overflow-hidden')
+    }
+    return () => {
+      document.body.classList.remove('overflow-hidden')
+    }
+  }, [isMobileMenuOpen])
+
   const isActive = (path: string) => {
     return pathname === path ? 
       "text-[#4299e1] font-medium text-sm" : 
       "text-slate-200 hover:text-[#4299e1] transition-colors text-sm"
+  }
+
+  const mobileNavVariants = {
+    closed: {
+      opacity: 0,
+      x: '100%',
+      transition: {
+        duration: 0.3,
+        ease: 'easeInOut'
+      }
+    },
+    open: {
+      opacity: 1,
+      x: '0%',
+      transition: {
+        duration: 0.3,
+        ease: 'easeInOut'
+      }
+    }
   }
 
   return (
@@ -94,33 +142,94 @@ export default function Navigation() {
               </div>
             </div>
             
-            {/* Mobile Navigation */}
-            <div className="flex md:hidden items-center">
-              <div className="flex space-x-4 items-center">
-                <Link 
-                  href="/" 
-                  className={`${pathname === '/' ? 'text-[#4299e1] font-medium' : 'text-slate-200'} text-sm my-auto flex items-center`}
-                >
-                  Ask
-                </Link>
-                <Link 
-                  href="/pricing" 
-                  className={`${pathname === '/pricing' ? 'text-[#4299e1] font-medium' : 'text-slate-200'} text-sm my-auto flex items-center`}
-                >
-                  Pricing
-                </Link>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setIsContactOpen(true)}
-                  className="bg-[#4299e1] text-white text-xs px-3 py-1 rounded-md h-auto min-h-0"
-                >
-                  Join
-                </Button>
-              </div>
+            {/* Mobile Navigation Toggle */}
+            <div className="md:hidden">
+              <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="w-10 h-10 flex items-center justify-center text-white focus:outline-none"
+                aria-label="Toggle mobile menu"
+              >
+                {isMobileMenuOpen ? (
+                  <X size={24} className="text-white" />
+                ) : (
+                  <Menu size={24} className="text-white" />
+                )}
+              </button>
             </div>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div 
+              className="fixed inset-0 bg-black/70 z-40 md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            
+            {/* Slide-out Menu */}
+            <motion.div 
+              className="fixed right-0 top-0 bottom-0 w-[75%] max-w-[300px] bg-gradient-to-b from-[#111] to-black border-l border-gray-800 z-50 md:hidden overflow-y-auto"
+              variants={mobileNavVariants}
+              initial="closed"
+              animate="open"
+              exit="closed"
+            >
+              <div className="p-6 h-full flex flex-col">
+                <div className="flex justify-between items-center mb-8">
+                  <Logo className="h-7" />
+                  <button
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-10 h-10 flex items-center justify-center text-white focus:outline-none"
+                    aria-label="Close menu"
+                  >
+                    <X size={20} className="text-gray-400" />
+                  </button>
+                </div>
+                
+                {/* Mobile Menu Links */}
+                <div className="flex flex-col space-y-5 mt-4">
+                  <Link 
+                    href="/" 
+                    className={`flex items-center justify-between text-base ${pathname === '/' ? 'text-[#4299e1] font-medium' : 'text-white'} py-2`}
+                  >
+                    <span>Ask Clera</span>
+                    <ChevronRight size={16} className={pathname === '/' ? 'text-[#4299e1]' : 'text-gray-400'} />
+                  </Link>
+                  <Link 
+                    href="/pricing" 
+                    className={`flex items-center justify-between text-base ${pathname === '/pricing' ? 'text-[#4299e1] font-medium' : 'text-white'} py-2`}
+                  >
+                    <span>Pricing</span>
+                    <ChevronRight size={16} className={pathname === '/pricing' ? 'text-[#4299e1]' : 'text-gray-400'} />
+                  </Link>
+                  <div className="border-t border-gray-800 my-2"></div>
+                </div>
+                
+                {/* Mobile CTA */}
+                <div className="mt-auto pb-6">
+                  <Button 
+                    onClick={() => {
+                      setIsMobileMenuOpen(false)
+                      setIsContactOpen(true)
+                    }}
+                    className="w-full bg-[#4299e1] hover:bg-[#4299e1]/90 text-white py-3 rounded-lg flex items-center justify-center space-x-2"
+                  >
+                    <span>Join Waitlist</span>
+                    <ChevronRight size={16} />
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <ContactSlideout 
         isOpen={isContactOpen}

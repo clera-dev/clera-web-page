@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from "react";
 // Dynamically import the WorldMap component with SSR disabled
 const WorldMap = dynamic(() => import('./WorldMap'), { 
   ssr: false,
-  loading: () => <div className="h-80 w-[140%] overflow-hidden rounded-lg opacity-0 absolute bottom-[-160px] left-[-20%]"></div>
+  loading: () => <div className="h-80 w-[140%] overflow-hidden rounded-lg opacity-0 absolute bottom-[-120px] left-[-20%] scale-[0.95]"></div>
 });
 
 export const NewsCard = ({
@@ -121,7 +121,7 @@ export const NewsCard = ({
       {/* World Map background with gradient overlay to ensure text readability */}
       <div className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${isMobile && isHovered ? 'opacity-100' : 'opacity-0 group-hover/card:opacity-100'}`}>
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#0a0a0f] to-[#0a0a0f]/20 z-[9]"></div>
-        <div className="h-80 w-[140%] overflow-hidden rounded-lg absolute bottom-[-160px] left-[-20%]">
+        <div className={`h-80 w-[140%] overflow-hidden rounded-lg absolute ${isMobile ? 'bottom-[-160px] left-[-20%]' : 'bottom-[-120px] left-[-20%] scale-[0.95]'}`}>
           <WorldMap 
             highlightColor="#ffeb3b"
             baseColor="#353D69"

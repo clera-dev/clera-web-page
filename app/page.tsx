@@ -58,11 +58,11 @@ export default function Home() {
           />
         </div>
         
-        <div className="container relative z-10 mx-auto px-8 sm:px-12 md:px-16 lg:px-24 py-16 flex flex-col items-start justify-center">
+        <div className="container relative z-10 mx-auto px-4 sm:px-8 md:px-16 lg:px-24 py-8 md:py-16 flex flex-col items-start justify-center">
           {/* Hero Section with motion animations */}
-          <div className="text-left mb-96">            
+          <div className="text-left mb-40 sm:mb-64 md:mb-96">            
             <motion.h2 
-              className="text-5xl md:text-7xl font-semibold text-white mb-6 break-words md:break-normal"
+              className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold text-white mb-4 md:mb-6 leading-tight break-words md:break-normal"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ 
@@ -74,7 +74,7 @@ export default function Home() {
             </motion.h2>
             
             <motion.p 
-              className="text-xl md:text-2xl text-slate-300 max-w-2xl mb-8 break-words"
+              className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-300 max-w-2xl mb-6 md:mb-8 leading-relaxed break-words"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ 
@@ -96,7 +96,7 @@ export default function Home() {
               }}
             >
               <Button 
-                className="w-64 bg-white text-black border-2 border-black px-8 py-6 text-lg font-medium shadow-[0_0_0_2px_rgba(0,0,0,1)] transition-colors duration-300 hover:bg-black hover:text-white hover:border-white hover:shadow-[0_0_0_2px_rgba(255,255,255,1)]"
+                className="w-full sm:w-64 bg-white text-black border-2 border-black px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-medium shadow-[0_0_0_2px_rgba(0,0,0,1)] transition-colors duration-300 hover:bg-black hover:text-white hover:border-white hover:shadow-[0_0_0_2px_rgba(255,255,255,1)]"
                 style={{ borderRadius: '50px' }}
                 onClick={() => {
                   // Find the ContactSlideout component and open it

@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, useAnimation, useInView } from "framer-motion";
 import { cn } from "@/lib/utils";
 import React, { useEffect, useState, useRef } from 'react';
 
@@ -18,6 +18,22 @@ export const FinancialCard = ({
 }) => {
   const isLarge = className?.includes('md:row-span-2');
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: false, amount: 0.3 });
+  
+  // Detect if on mobile device
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Check on mount and when window resizes
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
   
   // Generate realistic-looking stock data with fewer data points
   const generateStockData = (days = 45, volatility = 0.1, trend = 0.2, startPrice = 100) => {
@@ -61,9 +77,9 @@ export const FinancialCard = ({
   const [animationComplete, setAnimationComplete] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
 
-  // Chart dimensions
+  // Chart dimensions - make responsive for mobile
   const width = 600;
-  const height = 120;
+  const height = isMobile ? 100 : 120; // Smaller height on mobile
 
   useEffect(() => {
     // Generate data with different characteristics for each line
@@ -116,6 +132,7 @@ export const FinancialCard = ({
   
   return (
     <motion.div
+      ref={ref}
       className={cn(
         "row-span-1 rounded-xl group/card hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-6 dark:bg-[#0a0a0f]/60 dark:border-white/[0.1] backdrop-blur-sm border border-white/5 justify-between flex flex-col relative overflow-hidden",
         className
@@ -168,7 +185,7 @@ export const FinancialCard = ({
             {title}
           </div>
         </div>
-        <div className={`font-normal text-slate-400 ${isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed'} mb-4`}>
+        <div className={`font-normal text-slate-400 ${isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed'} ${isMobile ? 'mb-16' : 'mb-4'}`}>
           {description}
         </div>
         
@@ -176,27 +193,32 @@ export const FinancialCard = ({
         <div className="flex-grow"></div>
       </div>
       
-      {/* Stock Chart Animation */}
-      <motion.div 
-        className="absolute inset-0 w-full h-full"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isHovered ? 1 : 0 }}
-        transition={{ duration: 0.5 }}
+      {/* Stock Chart Animation - Adjusted positioning for desktop */}
+      <div 
+        className={`absolute bottom-0 left-0 right-0 ${isMobile ? 'h-24' : 'h-36'} overflow-hidden transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+        style={{ 
+          transform: isMobile ? 'scale(0.85) translateY(5px)' : 'scale(1) translateY(-15px)',
+          transformOrigin: 'bottom center'
+        }}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#0a0a0f] to-[#0a0a0f]/20 z-[9]"></div>
         
-        {/* Chart container - Adjusted height and position */}
-        <div className="absolute bottom-0 left-0 right-0 h-[45%] flex items-end justify-center z-[10] px-6 pb-1">
+        {/* Chart container - Adjusted height and position for both mobile and desktop */}
+        <div className={`absolute bottom-0 left-0 right-0 ${isMobile ? 'h-[45%]' : 'h-[65%]'} flex items-end justify-center z-[10] px-6 pb-1`}>
           <div className="relative w-full h-full">
             {/* Legend - Removed as requested */}
 
             <svg
               ref={svgRef}
+              width={width}
+              height={height}
               viewBox={`0 0 ${width} ${height}`}
-              className="w-full h-full"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="absolute top-0 left-1/2 transform -translate-x-1/2"
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              preserveAspectRatio="xMidYMid meet"
+              style={{ maxWidth: '100%' }}
             >
               {/* Grid lines - horizontal */}
               {[0, 1, 2].map((i) => (
@@ -481,7 +503,7 @@ export const FinancialCard = ({
             </svg>
           </div>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }; 

@@ -88,6 +88,7 @@ interface WorldMapProps {
   dotSize?: number;
   dotColor?: string;
   highlightedDotColor?: string;
+  isMobile?: boolean;
 }
 
 export function WorldMap({
@@ -98,6 +99,7 @@ export function WorldMap({
   dotSize = 0.4,
   dotColor = "#ffffff",
   highlightedDotColor = "#ffeb3b",
+  isMobile = false,
 }: WorldMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -105,6 +107,12 @@ export function WorldMap({
   const [activeConnection, setActiveConnection] = useState<number | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const { theme } = useTheme() || { theme: 'dark' };
+
+  // Adjust the scale and size based on mobile or desktop
+  const adjustedDotSize = isMobile ? dotSize * 0.8 : dotSize;
+  
+  // Choose the grid pattern based on mobile or desktop
+  const gridPattern = isMobile ? 'vertical' : 'diagonal';
 
   // Function to project geographical coordinates to pixel coordinates
   const projectPoint = (lat: number, lng: number) => {
@@ -127,7 +135,7 @@ export function WorldMap({
 
     try {
       // Create a DottedMap with proper configuration
-      const map = new DottedMap({ height: 100, grid: 'diagonal' });
+      const map = new DottedMap({ height: 50, grid: gridPattern });
 
       // Add all connection points to the map
       CONNECTIONS.forEach(conn => {
@@ -135,20 +143,20 @@ export function WorldMap({
         map.addPin({
           lat: conn.startLat,
           lng: conn.startLng,
-          svgOptions: { color: dotColor, radius: dotSize }
+          svgOptions: { color: dotColor, radius: adjustedDotSize }
         });
 
         // Add end point
         map.addPin({
           lat: conn.endLat,
           lng: conn.endLng,
-          svgOptions: { color: dotColor, radius: dotSize }
+          svgOptions: { color: dotColor, radius: adjustedDotSize }
         });
       });
 
       // Get SVG representation
       const svgMap = map.getSVG({
-        radius: dotSize,
+        radius: adjustedDotSize,
         color: dotColor,
         shape: 'circle',
         backgroundColor: backgroundColor
@@ -168,7 +176,7 @@ export function WorldMap({
     } catch (err) {
       console.error("Error initializing map:", err);
     }
-  }, [backgroundColor, dotColor, dotSize]);
+  }, [adjustedDotSize, gridPattern, backgroundColor, dotColor, isMobile]);
 
   if (!isMounted) return null;
 
@@ -224,7 +232,7 @@ export function WorldMap({
                 <circle
                   cx={startPoint.x}
                   cy={startPoint.y}
-                  r={isActive ? dotSize * 3 : dotSize * 2}
+                  r={isActive ? adjustedDotSize * 3 : adjustedDotSize * 2}
                   fill={isActive ? highlightedDotColor : connection.color}
                 />
                 
@@ -232,14 +240,14 @@ export function WorldMap({
                   <circle
                     cx={startPoint.x}
                     cy={startPoint.y}
-                    r={dotSize * 2}
+                    r={adjustedDotSize * 2}
                     fill={isActive ? highlightedDotColor : connection.color}
                     opacity="0.5"
                   >
                     <animate
                       attributeName="r"
-                      from={dotSize * 2}
-                      to={dotSize * 6}
+                      from={adjustedDotSize * 2}
+                      to={adjustedDotSize * 6}
                       dur="1.5s"
                       begin="0s"
                       repeatCount="indefinite"
@@ -261,7 +269,7 @@ export function WorldMap({
                 <circle
                   cx={endPoint.x}
                   cy={endPoint.y}
-                  r={isActive ? dotSize * 3 : dotSize * 2}
+                  r={isActive ? adjustedDotSize * 3 : adjustedDotSize * 2}
                   fill={isActive ? highlightedDotColor : connection.color}
                 />
                 
@@ -269,14 +277,14 @@ export function WorldMap({
                   <circle
                     cx={endPoint.x}
                     cy={endPoint.y}
-                    r={dotSize * 2}
+                    r={adjustedDotSize * 2}
                     fill={isActive ? highlightedDotColor : connection.color}
                     opacity="0.5"
                   >
                     <animate
                       attributeName="r"
-                      from={dotSize * 2}
-                      to={dotSize * 6}
+                      from={adjustedDotSize * 2}
+                      to={adjustedDotSize * 6}
                       dur="1.5s"
                       begin="0s"
                       repeatCount="indefinite"
