@@ -51,10 +51,10 @@ export default function Navigation() {
             ? "bg-black py-2"
             : "bg-black py-4"
         } sticky top-0 z-50 transition-all duration-300`}>
-        {/* This div controls the total max width and centers the content */}
-        <div className="mx-auto px-4 md:px-8" style={{ maxWidth: "84rem" }}>
+        {/* This div controls the width constraints and centers the content, matching main page */}
+        <div className="mx-auto" style={{ maxWidth: "84rem" }}>
           {/* This div aligns with the vertical lines from the page layout */}
-          <div className="mx-auto flex justify-between items-center" style={{ maxWidth: "calc(84rem - 4rem)", margin: "0 auto" }}>
+          <div className="mx-auto flex justify-between items-center px-6 sm:px-8 md:px-12 lg:px-16">
             <Link href="/" className="flex items-center">
               <Logo className="my-1" />
             </Link>

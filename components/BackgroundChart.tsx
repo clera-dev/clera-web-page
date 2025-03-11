@@ -201,26 +201,7 @@ export default function BackgroundChart() {
             }}
           />
           
-          {/* Chart points also revealed with the same clip path */}
-          {chartPoints.filter((_, i) => i % 5 === 0).map((point, i) => (
-            <motion.circle
-              key={`point-${i}`}
-              cx={point.x}
-              cy={point.y}
-              r="3"
-              fill="#4299e1"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: isLoaded ? 1 : 0, scale: isLoaded ? 1 : 0 }}
-              transition={{ 
-                delay: 0.2 + (point.x / 1400) * 2.5, // Scale delay based on x position
-                duration: 0.3,
-                ease: "easeOut"
-              }}
-              style={{
-                filter: 'drop-shadow(0 0 6px rgba(66, 153, 225, 0.8))'
-              }}
-            />
-          ))}
+          {/* Removing dot markers entirely to fix floating dot issue */}
         </g>
       </svg>
     </div>

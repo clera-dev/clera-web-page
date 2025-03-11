@@ -54,7 +54,10 @@ export default function WaitlistForm() {
     setErrorMessage('')
 
     try {
-      console.log('Submitting to Supabase:', { name, email })
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Submitting to Supabase:', { name, email })
+      }
       
       // Create a properly typed entry object
       const waitlistEntry: WaitlistEntry = {
@@ -69,10 +72,14 @@ export default function WaitlistForm() {
         .from('waitlist')
         .insert([waitlistEntry])
       
-      console.log('Supabase response:', { data, error })
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Supabase response:', { data, error })
+      }
       
       // Check for errors specifically 
       if (error) {
+        // Error logging is fine to keep for production
         console.error('Supabase error details:', {
           message: error.message,
           details: error.details,
@@ -97,7 +104,10 @@ export default function WaitlistForm() {
       }
 
       // If we get here, the submission was successful
-      console.log('Successfully added to waitlist:', data)
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Successfully added to waitlist:', data)
+      }
       triggerConfetti()
       setStatus('success')
       setName('')

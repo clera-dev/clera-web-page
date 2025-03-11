@@ -15,6 +15,16 @@ export const viewport = {
   userScalable: true,
 }
 
+// Add metadata for the site, including favicon
+export const metadata = {
+  title: 'Clera',
+  description: 'Clera - AI assistant for your business',
+  icons: {
+    icon: '/clera-circle.png',
+    apple: '/clera-circle.png',
+  },
+}
+
 export default function RootLayout({
   children,
 }: {

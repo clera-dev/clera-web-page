@@ -60,7 +60,10 @@ export default function ContactSlideout({ isOpen, onClose }: ContactSlideoutProp
     setErrorMessage('')
     
     try {
-      console.log('Waitlist signup:', { name, email })
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Waitlist signup:', { name, email })
+      }
       
       // Create a properly typed entry object
       const waitlistEntry: WaitlistEntry = {
@@ -73,10 +76,14 @@ export default function ContactSlideout({ isOpen, onClose }: ContactSlideoutProp
         .from('waitlist')
         .insert(waitlistEntry)
       
-      console.log('Supabase response:', { data, error })
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Supabase response:', { data, error })
+      }
       
       // Check for errors specifically 
       if (error) {
+        // Error logging is fine to keep for production
         console.error('Supabase error details:', {
           message: error.message,
           details: error.details,
@@ -101,7 +108,10 @@ export default function ContactSlideout({ isOpen, onClose }: ContactSlideoutProp
       }
       
       // If we get here, the submission was successful
-      console.log('Successfully added to waitlist:', data)
+      // Only log in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Successfully added to waitlist:', data)
+      }
       triggerConfetti()
       setIsSubmitted(true)
       setStatus('success')
