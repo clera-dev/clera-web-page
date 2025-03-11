@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 
 export default function BackgroundChart() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [isLoaded, setIsLoaded] = useState(false)
   
   // Generate points for the chart immediately (not state dependent)
   const chartPoints = generateChartPoints()
@@ -100,6 +101,17 @@ export default function BackgroundChart() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
   
+  // Set loaded state after component mounts to ensure smooth animation start
+  useEffect(() => {
+    // Short timeout to ensure browser has finished initial rendering
+    const timer = setTimeout(() => {
+      setIsLoaded(true)
+    }, 200)
+    
+    return () => clearTimeout(timer)
+  }, [])
+  
+  // Use a single SVG clipPath approach for smoother animation
   return (
     <div 
       ref={containerRef}
@@ -142,58 +154,74 @@ export default function BackgroundChart() {
           />
         ))}
         
-        {/* Area under the chart - simple, linear animation */}
+        {/* Area under the chart - fade in effect */}
         <motion.path
           d={areaPathString}
           fill="url(#gradient)"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.5 }}
+          animate={{ opacity: isLoaded ? 0.5 : 0 }}
           transition={{ duration: 2, ease: "linear" }}
         />
         
-        {/* The chart line path - use simple, linear animation for smoothness */}
-        <motion.path
-          d={pathString}
-          fill="none"
-          stroke="#4299e1"
-          strokeWidth="2"
-          strokeLinecap="round"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 2.5, ease: "linear" }}
-          style={{
-            filter: 'drop-shadow(0 0 8px rgba(66, 153, 225, 0.5))'
-          }}
-        />
-        
-        {/* Interactive data points - appear sequentially */}
-        {chartPoints.filter((_, i) => i % 5 === 0).map((point, i) => (
-          <motion.circle
-            key={`point-${i}`}
-            cx={point.x}
-            cy={point.y}
-            r="3"
-            fill="#4299e1"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ 
-              delay: 1.5 + (i * 0.05),
-              duration: 0.3,
-              ease: "easeOut"
-            }}
-            style={{
-              filter: 'drop-shadow(0 0 6px rgba(66, 153, 225, 0.8))'
-            }}
-          />
-        ))}
-        
-        {/* Gradients */}
+        {/* Add clipPath definition for the animation */}
         <defs>
+          <clipPath id="chart-reveal-clip">
+            <motion.rect
+              x="0"
+              y="0"
+              initial={{ width: 0 }}
+              animate={{ width: isLoaded ? 1400 : 0 }}
+              transition={{ 
+                duration: 2.5, 
+                ease: "easeInOut",
+                delay: 0.2
+              }}
+              width="1400"
+              height="500"
+            />
+          </clipPath>
+          
+          {/* Gradients */}
           <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#4299e1" stopOpacity="0.9" />
             <stop offset="100%" stopColor="#4299e1" stopOpacity="0.2" />
           </linearGradient>
         </defs>
+        
+        {/* Single chart line with clipPath for smooth reveal */}
+        <g clipPath="url(#chart-reveal-clip)">
+          <path
+            d={pathString}
+            fill="none"
+            stroke="#4299e1"
+            strokeWidth="2"
+            strokeLinecap="round"
+            style={{
+              filter: 'drop-shadow(0 0 8px rgba(66, 153, 225, 0.5))'
+            }}
+          />
+          
+          {/* Chart points also revealed with the same clip path */}
+          {chartPoints.filter((_, i) => i % 5 === 0).map((point, i) => (
+            <motion.circle
+              key={`point-${i}`}
+              cx={point.x}
+              cy={point.y}
+              r="3"
+              fill="#4299e1"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: isLoaded ? 1 : 0, scale: isLoaded ? 1 : 0 }}
+              transition={{ 
+                delay: 0.2 + (point.x / 1400) * 2.5, // Scale delay based on x position
+                duration: 0.3,
+                ease: "easeOut"
+              }}
+              style={{
+                filter: 'drop-shadow(0 0 6px rgba(66, 153, 225, 0.8))'
+              }}
+            />
+          ))}
+        </g>
       </svg>
     </div>
   )

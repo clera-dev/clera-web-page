@@ -1,14 +1,15 @@
 import Image from 'next/image'
+import { cn } from '@/lib/utils'
 
-export default function Logo() {
+export default function Logo({ className }: { className?: string }) {
   return (
-    <div className="flex items-center justify-center pt-4">
+    <div className={cn("flex items-center", className)}>
       <Image
-        src="/clera-logo.png?v=2"
+        src="/clera-logo.png"
         alt="Clera Logo"
-        width={120}
+        width={100}
         height={30}
-        className="h-auto"
+        className="h-8 w-auto"
         priority
       />
     </div>

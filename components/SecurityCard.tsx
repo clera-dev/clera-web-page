@@ -18,6 +18,39 @@ export const SecurityCard = ({
   let mouseY = useMotionValue(0);
   const [randomString, setRandomString] = useState("");
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect if on mobile device
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Check on mount and when window resizes
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+
+  // Auto-activate hover effect on mobile
+  useEffect(() => {
+    if (isMobile) {
+      const mobileActivateTimeout = setTimeout(() => {
+        setIsHovered(true);
+        
+        // Set mouse values to center of card for mobile
+        if (isMobile) {
+          mouseX.set(150); // Approximate center X
+          mouseY.set(100); // Approximate center Y
+          const str = generateRandomString(1500);
+          setRandomString(str);
+        }
+      }, 500);
+      
+      return () => clearTimeout(mobileActivateTimeout);
+    }
+  }, [isMobile, mouseX, mouseY]);
 
   useEffect(() => {
     const str = generateRandomString(1500);
@@ -32,6 +65,8 @@ export const SecurityCard = ({
   }, []);
 
   function onMouseMove({ currentTarget, clientX, clientY }: any) {
+    if (isMobile) return; // Skip for mobile
+    
     const { left, top } = currentTarget.getBoundingClientRect();
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);
@@ -49,8 +84,9 @@ export const SecurityCard = ({
     >
       <motion.div
         onMouseMove={onMouseMove}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={() => !isMobile && setIsHovered(true)}
+        onMouseLeave={() => !isMobile && setIsHovered(false)}
+        onTouchStart={() => isMobile && setIsHovered(true)}
         className="group/card rounded-xl w-full relative overflow-hidden bg-[#0a0a0f]/60 backdrop-blur-sm border border-white/5 h-full"
         whileHover={{ 
           y: -5,
@@ -66,6 +102,7 @@ export const SecurityCard = ({
           mouseX={mouseX}
           mouseY={mouseY}
           randomString={randomString}
+          isHovered={isHovered}
         />
         
         <div className="relative z-10 p-6 h-full flex flex-col">
@@ -99,7 +136,7 @@ export const SecurityCard = ({
   );
 };
 
-export function CardPattern({ mouseX, mouseY, randomString }: any) {
+export function CardPattern({ mouseX, mouseY, randomString, isHovered }: any) {
   let maskImage = useMotionTemplate`radial-gradient(250px at ${mouseX}px ${mouseY}px, white, transparent)`;
   let style = { maskImage, WebkitMaskImage: maskImage };
 
@@ -109,10 +146,12 @@ export function CardPattern({ mouseX, mouseY, randomString }: any) {
       <motion.div
         className="absolute inset-0 rounded-xl bg-gradient-to-r from-red-800/40 to-red-900/30 opacity-0 group-hover/card:opacity-70 backdrop-blur-sm transition duration-500"
         style={style}
+        animate={{ opacity: isHovered ? 0.7 : 0 }}
       />
       <motion.div
         className="absolute inset-0 rounded-xl opacity-0 mix-blend-overlay group-hover/card:opacity-60"
         style={style}
+        animate={{ opacity: isHovered ? 0.6 : 0 }}
       >
         <p className="absolute inset-x-0 text-xs h-full break-words whitespace-pre-wrap text-white/70 font-mono font-bold transition duration-500">
           {randomString}

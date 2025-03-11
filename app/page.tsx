@@ -62,7 +62,7 @@ export default function Home() {
           {/* Hero Section with motion animations */}
           <div className="text-left mb-96">            
             <motion.h2 
-              className="text-5xl md:text-7xl font-semibold text-white mb-6"
+              className="text-5xl md:text-7xl font-semibold text-white mb-6 break-words md:break-normal"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ 
@@ -74,7 +74,7 @@ export default function Home() {
             </motion.h2>
             
             <motion.p 
-              className="text-xl md:text-2xl text-slate-300 max-w-2xl mb-8"
+              className="text-xl md:text-2xl text-slate-300 max-w-2xl mb-8 break-words"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ 
@@ -110,17 +110,17 @@ export default function Home() {
           </div>
           
           {/* Add Ticker Banner below the hero section */}
-          <div className="w-full -mt-[4.25rem] mb-32">
+          <div className="w-full -mt-[8.25rem] mb-32">
             <TickerBanner />
           </div>
           
           {/* Features section */}
           <div className="pt-16 pb-48 w-full">
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <h1 className="text-4xl md:text-5xl font-bold mb-6 whitespace-nowrap tracking-tight leading-none mx-auto flex justify-center">
-                Powerful and Smart Investing Made Simple
+              <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight leading-none mx-auto flex justify-center">
+                <span className="whitespace-normal md:whitespace-nowrap">Powerful and Smart Investing Made Simple</span>
               </h1>
-              <p className="text-xl text-slate-300 mb-10">
+              <p className="text-xl text-slate-300 mb-10 break-words px-2 md:px-0">
                 Clera's AI-powered platform offers everything you need to make informed investment decisions at one low monthly fee.
               </p>
             </div>

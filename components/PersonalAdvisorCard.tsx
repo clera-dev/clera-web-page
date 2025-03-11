@@ -24,6 +24,33 @@ export const PersonalAdvisorCard = ({
   const [isChatVisible, setIsChatVisible] = useState(false);
   const [isConversationComplete, setIsConversationComplete] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [wasTouched, setWasTouched] = useState(false);
+  
+  // Detect if on mobile device
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Check on mount and when window resizes
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+  
+  // Auto-activate chat on mobile after being in view for a few seconds
+  useEffect(() => {
+    if (isMobile) {
+      // Auto-show the chat interface on mobile after a delay
+      const timeout = setTimeout(() => {
+        setIsHovered(true);
+      }, 1000);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [isMobile]);
   
   // State for client-side only particles
   const [particles, setParticles] = useState<Array<{
@@ -51,20 +78,23 @@ export const PersonalAdvisorCard = ({
   // Show chat interface after a delay when hovered
   useEffect(() => {
     let timeout: NodeJS.Timeout;
-    if (isHovered) {
+    if (isHovered || wasTouched) {
       timeout = setTimeout(() => {
         setIsChatVisible(true);
         // Start the message sequence
         setActiveMessageIndex(0);
       }, 300);
     } else {
-      setIsChatVisible(false);
-      setActiveMessageIndex(-1);
-      setIsConversationComplete(false);
+      // Only reset on desktop or if explicitly un-hovered
+      if (!isMobile) {
+        setIsChatVisible(false);
+        setActiveMessageIndex(-1);
+        setIsConversationComplete(false);
+      }
     }
     
     return () => clearTimeout(timeout);
-  }, [isHovered]);
+  }, [isHovered, wasTouched, isMobile]);
 
   // Advance through messages
   useEffect(() => {
@@ -121,8 +151,14 @@ export const PersonalAdvisorCard = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
+      onHoverStart={() => !isMobile && setIsHovered(true)}
+      onHoverEnd={() => !isMobile && setIsHovered(false)}
+      onTouchStart={() => {
+        if (isMobile) {
+          setWasTouched(true);
+          setIsHovered(true);
+        }
+      }}
       ref={containerRef}
     >
       {/* Content */}

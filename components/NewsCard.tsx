@@ -1,8 +1,9 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { cn } from "@/lib/utils";
 import dynamic from 'next/dynamic';
 import { LucideIcon } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 
 // Dynamically import the WorldMap component with SSR disabled
 const WorldMap = dynamic(() => import('./WorldMap'), { 
@@ -24,9 +25,38 @@ export const NewsCard = ({
   iconBg?: string;
 }) => {
   const isLarge = className?.includes('md:row-span-2');
+  const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: false, amount: 0.5 });
+  
+  // Detect if on mobile device
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Check on mount and when window resizes
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+  
+  // Auto-activate on mobile when in view
+  useEffect(() => {
+    if (isMobile && isInView) {
+      const timeout = setTimeout(() => {
+        setIsHovered(true);
+      }, 500);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [isMobile, isInView]);
   
   return (
     <motion.div
+      ref={ref}
       className={cn(
         "row-span-1 rounded-xl group/card hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-6 dark:bg-[#0a0a0f]/60 dark:border-white/[0.1] backdrop-blur-sm border border-white/5 justify-between flex flex-col relative overflow-hidden",
         className
@@ -40,6 +70,9 @@ export const NewsCard = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
+      onHoverStart={() => !isMobile && setIsHovered(true)}
+      onHoverEnd={() => !isMobile && setIsHovered(false)}
+      onTouchStart={() => isMobile && setIsHovered(true)}
     >
       {/* Content */}
       <div className="z-10 flex flex-col h-full">
@@ -86,7 +119,7 @@ export const NewsCard = ({
       </div>
       
       {/* World Map background with gradient overlay to ensure text readability */}
-      <div className="absolute inset-0 w-full h-full opacity-0 group-hover/card:opacity-100 transition-opacity duration-700 ease-in-out">
+      <div className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${isMobile && isHovered ? 'opacity-100' : 'opacity-0 group-hover/card:opacity-100'}`}>
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#0a0a0f] to-[#0a0a0f]/20 z-[9]"></div>
         <div className="h-80 w-[140%] overflow-hidden rounded-lg absolute bottom-[-160px] left-[-20%]">
           <WorldMap 

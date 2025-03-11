@@ -46,21 +46,21 @@ export default function Navigation() {
 
   return (
     <>
-      <nav className={`sticky top-0 left-0 right-0 z-50 bg-black transition-all duration-200 
-        ${hasScrolled ? 'border-b border-white/10' : 'border-b border-transparent'}`}>
-        <div className="w-full">
-          <div className="flex items-center justify-between h-14 max-w-7xl mx-auto px-6">
-            {/* Left side logo - positioned near left edge */}
-            <div className="flex-shrink-0 flex items-center h-full pb-[3px] -ml-4">
-              <div className="transform scale-[0.7]">
-                <Link href="/">
-                  <Logo />
-                </Link>
-              </div>
-            </div>
-
-            {/* Right side nav items - positioned near right edge */}
-            <div className="flex items-center space-x-6">
+      <nav className={`${
+          hasScrolled || pathname !== "/"
+            ? "bg-black py-2"
+            : "bg-black py-4"
+        } sticky top-0 z-50 transition-all duration-300`}>
+        {/* This div controls the total max width and centers the content */}
+        <div className="mx-auto px-4 md:px-8" style={{ maxWidth: "84rem" }}>
+          {/* This div aligns with the vertical lines from the page layout */}
+          <div className="mx-auto flex justify-between items-center" style={{ maxWidth: "calc(84rem - 4rem)", margin: "0 auto" }}>
+            <Link href="/" className="flex items-center">
+              <Logo className="my-1" />
+            </Link>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-6">
               <Link 
                 href="/" 
                 className={isActive('/')}
@@ -91,6 +91,31 @@ export default function Navigation() {
                     Join Waitlist
                   </Button>
                 </motion.div>
+              </div>
+            </div>
+            
+            {/* Mobile Navigation */}
+            <div className="flex md:hidden items-center">
+              <div className="flex space-x-4 items-center">
+                <Link 
+                  href="/" 
+                  className={`${pathname === '/' ? 'text-[#4299e1] font-medium' : 'text-slate-200'} text-sm my-auto flex items-center`}
+                >
+                  Ask
+                </Link>
+                <Link 
+                  href="/pricing" 
+                  className={`${pathname === '/pricing' ? 'text-[#4299e1] font-medium' : 'text-slate-200'} text-sm my-auto flex items-center`}
+                >
+                  Pricing
+                </Link>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsContactOpen(true)}
+                  className="bg-[#4299e1] text-white text-xs px-3 py-1 rounded-md h-auto min-h-0"
+                >
+                  Join
+                </Button>
               </div>
             </div>
           </div>

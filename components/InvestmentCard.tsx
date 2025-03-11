@@ -1,5 +1,5 @@
 "use client";
-import { motion, useAnimation } from "framer-motion";
+import { motion, useAnimation, useInView } from "framer-motion";
 import { cn } from "@/lib/utils";
 import React, { useEffect, useState, useRef } from 'react';
 
@@ -18,6 +18,9 @@ export const InvestmentCard = ({
 }) => {
   const isLarge = className?.includes('md:col-span-2');
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: false, amount: 0.3 });
   
   // Asset allocation data for our chart - representing different asset classes
   const assetData = [
@@ -28,8 +31,33 @@ export const InvestmentCard = ({
     { label: 'Cash', value: 4, color: 'rgba(72, 187, 120, 0.7)' },
   ];
   
+  // Detect if on mobile device
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Check on mount and when window resizes
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+  
+  // Auto-activate on mobile when in view
+  useEffect(() => {
+    if (isMobile && isInView) {
+      const timeout = setTimeout(() => {
+        setIsHovered(true);
+      }, 300);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [isMobile, isInView]);
+  
   return (
     <motion.div
+      ref={ref}
       className={cn(
         "row-span-1 rounded-xl group/card hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-6 dark:bg-[#0a0a0f]/60 dark:border-white/[0.1] backdrop-blur-sm border border-white/5 justify-between flex flex-col relative overflow-hidden",
         className
@@ -43,8 +71,9 @@ export const InvestmentCard = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
+      onHoverStart={() => !isMobile && setIsHovered(true)}
+      onHoverEnd={() => !isMobile && setIsHovered(false)}
+      onTouchStart={() => isMobile && setIsHovered(true)}
     >
       {/* Content */}
       <div className="z-10 flex flex-col h-full">
