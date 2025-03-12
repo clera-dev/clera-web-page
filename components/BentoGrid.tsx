@@ -90,7 +90,7 @@ export const BentoGrid = ({
           ? childrenArray.map((child, index) => (
               <div 
                 key={index} 
-                className="snap-center flex-shrink-0 w-[85%] first:pl-4 last:pr-4 h-[70vh] max-h-[600px] min-h-[450px]"
+                className={`snap-center flex-shrink-0 ${index === 0 ? 'w-[95%]' : 'w-[85%]'} first:pl-4 last:pr-4 h-[70vh] max-h-[600px] min-h-[450px]`}
               >
                 {child}
               </div>
