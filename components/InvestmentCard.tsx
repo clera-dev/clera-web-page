@@ -60,6 +60,7 @@ export const InvestmentCard = ({
       ref={ref}
       className={cn(
         "row-span-1 rounded-xl group/card hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-6 dark:bg-[#0a0a0f]/60 dark:border-white/[0.1] backdrop-blur-sm border border-white/5 justify-between flex flex-col relative overflow-hidden",
+        isMobile ? "h-[480px]" : "",
         className
       )}
       whileHover={{ 
@@ -107,17 +108,17 @@ export const InvestmentCard = ({
               {icon}
             </div>
           </div>
-          <div className={`font-bold text-white ml-3 ${isLarge ? 'text-2xl' : 'text-xl'} flex-grow`}>
+          <div className={`font-bold text-white ml-3 ${isMobile ? 'text-xl' : (isLarge ? 'text-2xl' : 'text-xl')} flex-grow`}>
             {title}
           </div>
         </div>
-        <div className={`font-normal text-slate-400 ${isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed'} mb-4`}>
+        <div className={`font-normal text-slate-400 ${isMobile ? 'text-sm' : (isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed')} leading-relaxed ${isMobile ? 'mb-20' : 'mb-4'}`}>
           {description}
         </div>
         
         {/* Portfolio value display - top right - only visible on hover */}
         <motion.div 
-          className="absolute top-6 right-6 text-right"
+          className={`absolute ${isMobile ? 'top-64' : 'top-6'} right-6 text-right`}
           initial={{ opacity: 0 }}
           animate={{ opacity: isHovered ? 1 : 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
@@ -127,7 +128,7 @@ export const InvestmentCard = ({
         </motion.div>
         
         {/* Spacer that pushes content up to make room for chart */}
-        <div className="flex-grow"></div>
+        <div className={`flex-grow ${isMobile ? 'min-h-[240px]' : ''}`}></div>
       </div>
       
       {/* 3D Bar Chart Animation */}
@@ -152,11 +153,11 @@ export const InvestmentCard = ({
             ></motion.div>
             
             {/* Grid lines - vertical - only visible on hover */}
-            {[...Array(5)].map((_, i) => (
+            {[...Array(isMobile ? 3 : 5)].map((_, i) => (
               <motion.div 
                 key={`grid-v-${i}`} 
                 className="absolute bottom-0 w-[1px] bg-[#7e57c2]/10 h-full"
-                style={{ left: `${20 * (i + 1)}%` }}
+                style={{ left: `${isMobile ? (33.3 * (i + 1)) : (20 * (i + 1))}%` }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: isHovered ? 1 : 0 }}
                 transition={{ duration: 0.3, delay: 0.2 + i * 0.05 }}
@@ -164,11 +165,11 @@ export const InvestmentCard = ({
             ))}
             
             {/* Grid lines - horizontal - only visible on hover */}
-            {[...Array(4)].map((_, i) => (
+            {[...Array(isMobile ? 2 : 4)].map((_, i) => (
               <motion.div 
                 key={`grid-h-${i}`} 
                 className="absolute left-0 h-[1px] bg-[#7e57c2]/10 w-full"
-                style={{ bottom: `${25 * (i + 1)}%` }}
+                style={{ bottom: `${isMobile ? (50 * (i + 1)) : (25 * (i + 1))}%` }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: isHovered ? 1 : 0 }}
                 transition={{ duration: 0.3, delay: 0.2 + i * 0.05 }}
@@ -232,7 +233,7 @@ export const InvestmentCard = ({
                 
                 {/* X-axis label */}
                 <motion.div 
-                  className="absolute bottom-[-32px] text-center text-[12px] text-[#7e57c2]/70 w-full px-1 font-medium"
+                  className={`absolute bottom-[-32px] text-center ${isMobile ? 'text-[9px]' : 'text-[12px]'} text-[#7e57c2]/70 w-full ${isMobile ? 'px-0.5' : 'px-1'} font-medium`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: isHovered ? 1 : 0 }}
                   transition={{ 

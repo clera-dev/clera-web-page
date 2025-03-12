@@ -67,7 +67,7 @@ export const PersonalAdvisorCard = ({
   const conversation = [
     {
       user: "Hi Clera, why did my technology stocks drop today?",
-      advisor: "Hi Julie, Tech stocks fell due to news about DeepSeek, a Chinese AI company. They showed that high-performing AI models can be built much cheaper, which impacted tech companies investing heavily in AI hardware."
+      advisor: "Hi Julie, Tech stocks fell due to news about DeepSeek. They showed that AI models can be built cheaper, impacting tech companies."
     },
     {
       user: "Can you help me switch to safer investments?",
@@ -98,6 +98,13 @@ export const PersonalAdvisorCard = ({
 
   // Advance through messages
   useEffect(() => {
+    // On mobile, only show the first exchange (first question and answer)
+    if (isMobile && activeMessageIndex >= 2) {
+      setIsConversationComplete(true);
+      return;
+    }
+    
+    // For desktop, show the full conversation
     if (activeMessageIndex >= 0 && activeMessageIndex < conversation.length * 2) {
       const timer = setTimeout(() => {
         setActiveMessageIndex(prev => prev + 1);
@@ -107,7 +114,7 @@ export const PersonalAdvisorCard = ({
     } else if (activeMessageIndex === conversation.length * 2) {
       setIsConversationComplete(true);
     }
-  }, [activeMessageIndex, conversation.length]);
+  }, [activeMessageIndex, conversation.length, isMobile]);
   
   // Generate animated particles for the background
   const generateParticles = (count: number) => {
@@ -132,14 +139,18 @@ export const PersonalAdvisorCard = ({
   }, []);
 
   // Function to determine if a message should be shown
-  const shouldShowMessage = (messageIndex: number) => {
+  const shouldShowMessage = (messageIndex: number, exchangeIndex: number) => {
+    // On mobile, only show the first exchange
+    if (isMobile && exchangeIndex > 0) {
+      return false;
+    }
     return activeMessageIndex >= messageIndex;
   };
   
   return (
     <motion.div
       className={cn(
-        "row-span-1 rounded-xl group/card hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-6 dark:bg-[#0a0a0f]/60 dark:border-white/[0.1] backdrop-blur-sm border border-white/5 justify-between flex flex-col relative overflow-hidden",
+        "row-span-1 rounded-xl group/card hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-6 dark:bg-[#0a0a0f]/60 dark:border-white/[0.1] backdrop-blur-sm border border-white/5 justify-between flex flex-col relative overflow-hidden min-h-[280px] sm:min-h-0",
         className
       )}
       whileHover={{ 
@@ -197,12 +208,12 @@ export const PersonalAdvisorCard = ({
             {title}
           </div>
         </div>
-        <div className={`font-normal text-slate-400 ${isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed'} mb-4`}>
+        <div className={`font-normal text-slate-400 ${isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed'} ${isMobile ? 'mb-6' : 'mb-4'}`}>
           {description}
         </div>
         
         {/* Spacer that pushes content up to make room for chat interface */}
-        <div className="flex-grow"></div>
+        <div className={`flex-grow ${isMobile ? 'min-h-[240px]' : ''}`}></div>
       </div>
       
       {/* Redesigned Chat Interface that matches the image */}
@@ -242,105 +253,217 @@ export const PersonalAdvisorCard = ({
           </div>
         )}
         
-        {/* Chat Interface that matches the image - with adjusted height and overflow handling */}
-        <div className="absolute bottom-0 left-0 right-0 w-full max-w-full h-[400px] flex flex-col justify-between p-4 z-[10] mt-[120px] overflow-x-hidden">
-          {/* Chat messages area - increased height and fixed horizontal overflow */}
-          <div className="flex-grow flex flex-col space-y-4 overflow-y-auto overflow-x-hidden pb-2 max-h-[340px]">
-            {conversation.map((exchange, index) => (
-              <React.Fragment key={index}>
-                {/* User message */}
-                <AnimatePresence>
-                  {shouldShowMessage(index * 2) && (
-                    <motion.div 
-                      className="flex justify-end"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <div className="bg-gray-500/60 text-white rounded-3xl px-4 py-2 max-w-[90%] text-sm">
-                        {exchange.user}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+        {/* Chat Interface that matches the image - with fixed positioning for mobile */}
+        <div className={`absolute ${isMobile ? 'bottom-0' : 'bottom-0'} left-0 right-0 w-full max-w-full ${isMobile ? 'h-[200px]' : 'h-[400px]'} ${isMobile ? 'flex flex-col' : 'flex flex-col justify-between'} p-4 z-[10] ${isMobile ? 'mt-[200px]' : 'mt-[120px]'} overflow-x-hidden`}>
+          {/* Chat messages area - adjusted to ensure messages are visible */}
+          <div className={`${isMobile ? 'absolute top-[10px] left-4 right-4 overflow-visible h-[130px]' : 'flex-grow flex flex-col space-y-4 overflow-y-auto overflow-x-hidden pb-2 max-h-[340px]'}`}>
+            {isMobile ? (
+              // Mobile-specific rendering for better control
+              <>
+                {/* User question */}
+                {activeMessageIndex >= 0 && (
+                  <motion.div 
+                    className="flex justify-end mb-3"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="bg-gray-500/60 text-white rounded-3xl px-4 py-2 max-w-[90%] text-xs">
+                      {conversation[0].user}
+                    </div>
+                  </motion.div>
+                )}
+                
+                {/* Clera's response */}
+                {activeMessageIndex >= 1 && (
+                  <motion.div 
+                    className="flex justify-start"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="bg-[#1d1d1d] text-white rounded-3xl px-4 py-2 max-w-[90%] text-xs">
+                      {/* Changed to "Clera is thinking..." with animated dots */}
+                      <em>Clera is thinking</em>
+                      <motion.span
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 1.5,
+                          ease: "easeInOut",
+                        }}
+                      >...</motion.span>
+                    </div>
+                  </motion.div>
+                )}
+              </>
+            ) : (
+              // Desktop version remains unchanged
+              conversation.map((exchange, index) => (
+                <React.Fragment key={index}>
+                  {/* User message */}
+                  <AnimatePresence>
+                    {shouldShowMessage(index * 2, index) && (
+                      <motion.div 
+                        className="flex justify-end"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div className="bg-gray-500/60 text-white rounded-3xl px-4 py-2 max-w-[90%] text-sm">
+                          {exchange.user}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
-                {/* Advisor message */}
-                <AnimatePresence>
-                  {shouldShowMessage(index * 2 + 1) && (
-                    <motion.div 
-                      className="flex justify-start"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <div className="bg-[#1d1d1d] text-white rounded-3xl px-4 py-2 max-w-[90%] text-sm">
-                        {exchange.advisor}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </React.Fragment>
-            ))}
+                  {/* Advisor message */}
+                  <AnimatePresence>
+                    {shouldShowMessage(index * 2 + 1, index) && (
+                      <motion.div 
+                        className="flex justify-start"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div className="bg-[#1d1d1d] text-white rounded-3xl px-4 py-2 max-w-[90%] text-sm">
+                          {exchange.advisor}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </React.Fragment>
+              ))
+            )}
           </div>
           
-          {/* Separator line */}
-          <div className="w-full h-px bg-gray-600/50 mb-3"></div>
-          
-          {/* Input area with Clera icon, sound wave and arrow */}
-          <div className="flex items-center w-full overflow-hidden">
-            {/* Clera circle icon - using correct filename with hyphen */}
-            <div className="w-8 h-8 flex-shrink-0">
-              <img 
-                src="/clera-circle.png" 
-                alt="Clera"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            
-            {/* Sound wave visualization */}
-            <div className="flex items-center h-6 mx-2 flex-shrink-0">
-              {[...Array(5)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="w-[3px] bg-[#4299e1] mx-[2px] rounded-full"
-                  animate={{
-                    height: [6, 10 + Math.random() * 8, 6],
-                  }}
+          {/* Bottom fixed section for mobile */}
+          {isMobile && (
+            <div className="absolute bottom-0 left-0 right-0 p-4">
+              {/* Separator line */}
+              <div className="w-full h-px bg-gray-600/50 mb-2"></div>
+              
+              {/* Input area with Clera icon, sound wave and arrow */}
+              <div className="flex items-center w-full overflow-hidden py-2">
+                {/* Clera circle icon - using correct filename with hyphen */}
+                <div className="w-7 h-7 flex-shrink-0 flex items-center justify-center">
+                  <img 
+                    src="/clera-circle.png" 
+                    alt="Clera"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                
+                {/* Sound wave visualization */}
+                <div className="flex items-center h-6 mx-2 flex-shrink-0">
+                  {[...Array(3)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="w-[2px] mx-[1px] bg-[#4299e1] rounded-full"
+                      animate={{
+                        height: [6, 10 + Math.random() * 8, 6],
+                      }}
+                      transition={{
+                        duration: 2.5,
+                        repeat: Infinity,
+                        repeatType: "mirror",
+                        ease: "easeInOut",
+                        delay: i * 0.2,
+                      }}
+                    ></motion.div>
+                  ))}
+                </div>
+                
+                {/* "Ask Clera..." text with glow effect when conversation is complete */}
+                <motion.div 
+                  className="text-gray-400 text-xs flex-grow truncate"
+                  animate={isConversationComplete ? {
+                    textShadow: [
+                      "0 0 0px rgba(66, 153, 225, 0)",
+                      "0 0 10px rgba(66, 153, 225, 0.5)",
+                      "0 0 0px rgba(66, 153, 225, 0)"
+                    ]
+                  } : {}}
                   transition={{
-                    duration: 2.5,
+                    duration: 2,
                     repeat: Infinity,
-                    repeatType: "mirror",
-                    ease: "easeInOut",
-                    delay: i * 0.2,
+                    repeatType: "reverse"
                   }}
-                ></motion.div>
-              ))}
+                >
+                  Ask Clera....
+                </motion.div>
+                
+                {/* Arrow icon */}
+                <div className="text-[#4299e1] flex-shrink-0">
+                  <ArrowRight size={16} />
+                </div>
+              </div>
             </div>
-            
-            {/* "Ask Clera..." text with glow effect when conversation is complete */}
-            <motion.div 
-              className="text-gray-400 text-sm flex-grow truncate"
-              animate={isConversationComplete ? {
-                textShadow: [
-                  "0 0 0px rgba(66, 153, 225, 0)",
-                  "0 0 10px rgba(66, 153, 225, 0.5)",
-                  "0 0 0px rgba(66, 153, 225, 0)"
-                ]
-              } : {}}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatType: "reverse"
-              }}
-            >
-              Ask Clera....
-            </motion.div>
-            
-            {/* Arrow icon */}
-            <div className="text-[#4299e1] flex-shrink-0">
-              <ArrowRight size={20} />
-            </div>
-          </div>
+          )}
+          
+          {/* Desktop layout (unchanged) */}
+          {!isMobile && (
+            <>
+              {/* Separator line */}
+              <div className="w-full h-px bg-gray-600/50 mb-3"></div>
+              
+              {/* Input area with Clera icon, sound wave and arrow */}
+              <div className="flex items-center w-full overflow-hidden">
+                {/* Clera circle icon */}
+                <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
+                  <img 
+                    src="/clera-circle.png" 
+                    alt="Clera"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                
+                {/* Sound wave visualization */}
+                <div className="flex items-center h-6 mx-2 flex-shrink-0">
+                  {[...Array(5)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="w-[3px] mx-[2px] bg-[#4299e1] rounded-full"
+                      animate={{
+                        height: [6, 10 + Math.random() * 8, 6],
+                      }}
+                      transition={{
+                        duration: 2.5,
+                        repeat: Infinity,
+                        repeatType: "mirror",
+                        ease: "easeInOut",
+                        delay: i * 0.2,
+                      }}
+                    ></motion.div>
+                  ))}
+                </div>
+                
+                {/* "Ask Clera..." text with glow effect when conversation is complete */}
+                <motion.div 
+                  className="text-gray-400 text-sm flex-grow truncate"
+                  animate={isConversationComplete ? {
+                    textShadow: [
+                      "0 0 0px rgba(66, 153, 225, 0)",
+                      "0 0 10px rgba(66, 153, 225, 0.5)",
+                      "0 0 0px rgba(66, 153, 225, 0)"
+                    ]
+                  } : {}}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "reverse"
+                  }}
+                >
+                  Ask Clera....
+                </motion.div>
+                
+                {/* Arrow icon */}
+                <div className="text-[#4299e1] flex-shrink-0">
+                  <ArrowRight size={20} />
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </motion.div>
     </motion.div>

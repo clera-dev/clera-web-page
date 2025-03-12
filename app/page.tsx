@@ -9,7 +9,7 @@ import Link from "next/link"
 import FeatureCard from "@/components/FeatureCard"
 import { features } from "@/data/features"
 import { ArrowRight, LucideIcon } from "lucide-react"
-import { BentoGrid, BentoGridItem } from "@/components/BentoGrid"
+import { BentoGrid, BentoGridItem, MobileScrollbarStyle } from "@/components/BentoGrid"
 import { SecurityCard } from "@/components/SecurityCard"
 import { NewsCard } from '@/components/NewsCard'
 import { FinancialCard } from '@/components/FinancialCard'
@@ -30,37 +30,75 @@ export default function Home() {
   
   // Transform scroll progress to line height
   const lineHeight = useTransform(scrollYProgress, [0, 0.3], ["0%", "100%"])
+  
+  // Check if on mobile device or large display
+  const [isMobile, setIsMobile] = useState(false)
+  const [isLargeDisplay, setIsLargeDisplay] = useState(false)
+  
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    const checkIfLargeDisplay = () => {
+      setIsLargeDisplay(window.innerWidth > 1920)
+    }
+    
+    // Check on mount and when window resizes
+    checkIfMobile()
+    checkIfLargeDisplay()
+    
+    window.addEventListener('resize', checkIfMobile)
+    window.addEventListener('resize', checkIfLargeDisplay)
+    
+    return () => {
+      window.removeEventListener('resize', checkIfMobile)
+      window.removeEventListener('resize', checkIfLargeDisplay)
+    }
+  }, [])
+
+  // Add special handling for large displays to fix scroll positioning issues
+  useEffect(() => {
+    if (!isLargeDisplay) return
+    
+    // Force initial position to be clean for large displays
+    if (containerRef.current) {
+      const el = containerRef.current as HTMLElement
+      el.style.position = 'relative'
+      el.style.zIndex = '1'
+    }
+    
+    const handleScroll = () => {
+      // When at the top of the page on large displays, ensure clean layout
+      if (window.scrollY === 0) {
+        requestAnimationFrame(() => {
+          if (containerRef.current) {
+            // Force a repaint without changing visible layout
+            const el = containerRef.current as HTMLElement
+            el.style.display = 'none'
+            void el.offsetHeight // Trigger reflow
+            el.style.display = ''
+          }
+        })
+      }
+    }
+    
+    // Apply initial fix
+    handleScroll()
+    
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [isLargeDisplay])
 
   return (
     <>
-      <main ref={containerRef} className="relative min-h-screen bg-gradient-to-b from-black/30 to-[#0a0a0f]/30 pt-16 overflow-x-hidden">
+      <MobileScrollbarStyle />
+      <main ref={containerRef} className={`relative min-h-screen bg-gradient-to-b from-black/30 to-[#0a0a0f]/30 ${isLargeDisplay ? 'pt-[60px]' : 'pt-16'} overflow-x-hidden`}>
         <BackgroundChart />
         
-        {/* Left vertical line - animated */}
-        <div className="hidden md:block absolute left-[max(2rem,calc(50%-42rem))] top-0 bottom-0 w-[0.5px] h-full overflow-hidden">
-          <motion.div 
-            className="w-full bg-white opacity-40" 
-            style={{ 
-              height: lineHeight,
-              originY: 0
-            }}
-          />
-        </div>
-        
-        {/* Right vertical line - animated */}
-        <div className="hidden md:block absolute right-[max(2rem,calc(50%-42rem))] top-0 bottom-0 w-[0.5px] h-full overflow-hidden">
-          <motion.div 
-            className="w-full bg-white opacity-40" 
-            style={{ 
-              height: lineHeight,
-              originY: 0
-            }}
-          />
-        </div>
-        
-        <div className="container relative z-10 mx-auto px-4 sm:px-8 md:px-16 lg:px-24 py-8 md:py-16 flex flex-col items-start justify-center">
+        <div className={`container relative z-10 mx-auto px-4 sm:px-8 md:px-16 lg:px-24 ${isLargeDisplay ? 'py-16' : 'py-8 md:py-16'} flex flex-col items-start justify-center`}>
           {/* Hero Section with motion animations */}
-          <div className="text-left mb-40 sm:mb-64 md:mb-96">            
+          <div className="text-left mb-10 sm:mb-64 md:mb-96">            
             <motion.h2 
               className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold text-white mb-4 md:mb-6 leading-tight break-words md:break-normal"
               initial={{ opacity: 0, y: 20 }}
@@ -110,7 +148,7 @@ export default function Home() {
           </div>
           
           {/* Add Ticker Banner below the hero section */}
-          <div className="w-full -mt-[8.25rem] mb-32">
+          <div className="w-full mt-64 sm:-mt-[8.25rem] mb-16 sm:mb-32 relative" style={{ zIndex: 2 }}>
             <TickerBanner />
           </div>
           
@@ -120,15 +158,26 @@ export default function Home() {
               <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight leading-none mx-auto flex justify-center">
                 <span className="whitespace-normal md:whitespace-nowrap">Powerful and Smart Investing Made Simple</span>
               </h1>
-              <p className="text-xl text-slate-300 mb-10 break-words px-2 md:px-0">
+              <p className="text-xl text-slate-300 mb-8 break-words px-2 md:px-0">
                 Clera's AI-powered platform offers everything you need to make informed investment decisions at one low monthly fee.
               </p>
+              
+              {/* Mobile-only swipe indicator */}
+              {isMobile && (
+                <div className="flex items-center justify-center text-slate-400 text-sm gap-2 mb-2">
+                  <span>Swipe to explore</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14"></path>
+                    <path d="m12 5 7 7-7 7"></path>
+                  </svg>
+                </div>
+              )}
             </div>
             
             <BentoGrid className="px-4">
               {/* Personal Advisor - featured item spanning 2x2 */}
               <PersonalAdvisorCard 
-                className="md:col-span-2 md:row-span-2"
+                className="md:col-span-2 md:row-span-2 min-h-[24rem] sm:min-h-0"
                 title={features[0].title}
                 description={features[0].description}
                 icon={<FeatureIcon IconComponent={features[0].icon} isLarge={true} />}

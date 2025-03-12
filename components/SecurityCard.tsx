@@ -87,7 +87,7 @@ export const SecurityCard = ({
         onMouseEnter={() => !isMobile && setIsHovered(true)}
         onMouseLeave={() => !isMobile && setIsHovered(false)}
         onTouchStart={() => isMobile && setIsHovered(true)}
-        className="group/card rounded-xl w-full relative overflow-hidden bg-[#0a0a0f]/60 backdrop-blur-sm border border-white/5 h-full"
+        className={`group/card rounded-xl w-full relative overflow-hidden bg-[#0a0a0f]/60 backdrop-blur-sm border border-white/5 ${isMobile ? "h-[480px]" : "h-full"}`}
         whileHover={{ 
           y: -5,
           boxShadow: '0 10px 30px -15px rgba(220, 38, 38, 0.4)',
@@ -127,9 +127,12 @@ export const SecurityCard = ({
             <h3 className="font-bold text-white ml-3 text-xl group-hover/card:text-red-50 transition-colors duration-500">{title}</h3>
           </div>
           
-          <div className="font-normal text-slate-400 text-sm leading-relaxed relative z-20">
+          <div className={`font-normal text-slate-400 text-sm leading-relaxed relative z-20 ${isMobile ? 'mb-20' : ''}`}>
             {description}
           </div>
+          
+          {/* Spacer that pushes content up to make room for security animation */}
+          <div className={`flex-grow ${isMobile ? 'min-h-[240px]' : ''}`}></div>
         </div>
       </motion.div>
     </div>

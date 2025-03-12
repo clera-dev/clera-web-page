@@ -7,20 +7,44 @@ export default function BackgroundChart() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isLoaded, setIsLoaded] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [isLargeDisplay, setIsLargeDisplay] = useState(false)
   
-  // Check if we're on a mobile device
+  // Check if we're on a mobile device or large display
   useEffect(() => {
-    const checkMobile = () => {
+    const checkViewportSize = () => {
       setIsMobile(window.innerWidth < 768)
+      setIsLargeDisplay(window.innerWidth > 1920)
     }
     
     // Run on initial render
-    checkMobile()
+    checkViewportSize()
     
     // Listen for resize events
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    window.addEventListener('resize', checkViewportSize)
+    return () => window.removeEventListener('resize', checkViewportSize)
   }, [])
+  
+  // Additional handler for scroll events on large displays
+  useEffect(() => {
+    if (!isLargeDisplay) return
+    
+    const handleScroll = () => {
+      if (window.scrollY === 0) {
+        // Reset chart position when returning to top on large displays
+        if (containerRef.current) {
+          containerRef.current.style.transform = 'translate(-50%, 0) translateZ(0)'
+          setTimeout(() => {
+            if (containerRef.current) {
+              containerRef.current.style.transform = 'translate(-50%, 0)'
+            }
+          }, 10)
+        }
+      }
+    }
+    
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [isLargeDisplay])
   
   // Generate points for the chart immediately (not state dependent)
   const chartPoints = generateChartPoints()
@@ -136,7 +160,11 @@ export default function BackgroundChart() {
   return (
     <div 
       ref={containerRef}
-      className="absolute top-56 left-1/2 transform -translate-x-1/2 w-full max-w-[1400px] h-[700px] z-0 pointer-events-none px-4 sm:px-8 md:px-16 lg:px-24"
+      className={`absolute ${isMobile ? 'top-32' : isLargeDisplay ? 'top-16' : 'top-56'} left-1/2 transform -translate-x-1/2 w-full max-w-[1400px] h-[700px] z-0 pointer-events-none px-4 sm:px-8 md:px-16 lg:px-24`}
+      style={{
+        willChange: isLargeDisplay ? 'transform' : 'auto',
+        marginTop: isLargeDisplay ? '0' : 'auto'
+      }}
     >
       <svg 
         width="100%" 

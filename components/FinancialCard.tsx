@@ -19,6 +19,7 @@ export const FinancialCard = ({
   const isLarge = className?.includes('md:row-span-2');
   const [isHovered, setIsHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: false, amount: 0.3 });
   
@@ -34,6 +35,29 @@ export const FinancialCard = ({
     
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
+  
+  // Auto-activate on mobile when in view
+  useEffect(() => {
+    if (isMobile && isInView) {
+      const timeout = setTimeout(() => {
+        setIsHovered(true);
+      }, 600);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [isMobile, isInView]);
+  
+  // Add effect to simulate loading state
+  useEffect(() => {
+    if (isInView) {
+      // Simulate loading delay
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 600);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isInView]);
   
   // Generate realistic-looking stock data with fewer data points
   const generateStockData = (days = 45, volatility = 0.1, trend = 0.2, startPrice = 100) => {
@@ -135,6 +159,7 @@ export const FinancialCard = ({
       ref={ref}
       className={cn(
         "row-span-1 rounded-xl group/card hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-6 dark:bg-[#0a0a0f]/60 dark:border-white/[0.1] backdrop-blur-sm border border-white/5 justify-between flex flex-col relative overflow-hidden",
+        isMobile ? "h-[480px]" : "",
         className
       )}
       whileHover={{ 
@@ -146,8 +171,13 @@ export const FinancialCard = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
+      onHoverStart={() => !isMobile && setIsHovered(true)}
+      onHoverEnd={() => !isMobile && setIsHovered(false)}
+      onTouchStart={() => {
+        if (isMobile) {
+          setIsHovered(true);
+        }
+      }}
     >
       {/* Content */}
       <div className="z-10 flex flex-col h-full">
@@ -185,41 +215,41 @@ export const FinancialCard = ({
             {title}
           </div>
         </div>
-        <div className={`font-normal text-slate-400 ${isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed'} ${isMobile ? 'mb-16' : 'mb-4'}`}>
+        <div className={`font-normal text-slate-400 ${isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed'} ${isMobile ? 'mb-20' : 'mb-4'}`}>
           {description}
         </div>
         
         {/* Spacer that pushes content up to make room for chart */}
-        <div className="flex-grow"></div>
+        <div className={`flex-grow ${isMobile ? 'min-h-[240px]' : ''}`}></div>
       </div>
       
-      {/* Stock Chart Animation - Adjusted positioning for desktop */}
-      <div 
-        className={`absolute bottom-0 left-0 right-0 ${isMobile ? 'h-24' : 'h-36'} overflow-hidden transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
-        style={{ 
-          transform: isMobile ? 'scale(0.85) translateY(5px)' : 'scale(1) translateY(-15px)',
-          transformOrigin: 'bottom center'
-        }}
+      {/* Desktop Chart Animation */}
+      {!isMobile && (
+        <div 
+          className={`absolute bottom-0 left-0 right-0 h-36 overflow-hidden transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+          style={{ 
+            transform: 'scale(1) translateY(-15px)',
+            transformOrigin: 'bottom center'
+          }}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#0a0a0f] to-[#0a0a0f]/20 z-[9]"></div>
         
-        {/* Chart container - Adjusted height and position for both mobile and desktop */}
-        <div className={`absolute bottom-0 left-0 right-0 ${isMobile ? 'h-[45%]' : 'h-[65%]'} flex items-end justify-center z-[10] px-6 pb-1`}>
+          {/* Chart container - Desktop only */}
+          <div className={`absolute bottom-0 left-0 right-0 h-[65%] flex items-end justify-center z-[10] px-6 pb-1`}>
           <div className="relative w-full h-full">
-            {/* Legend - Removed as requested */}
-
             <svg
               ref={svgRef}
-              width={width}
-              height={height}
+                width={width}
+                height={height}
               viewBox={`0 0 ${width} ${height}`}
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="absolute top-0 left-1/2 transform -translate-x-1/2"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="absolute top-0 left-1/2 transform -translate-x-1/2"
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              style={{ maxWidth: '100%' }}
+                style={{ maxWidth: '100%' }}
             >
+                {/* SVG content (grid lines, paths, etc.) */}
               {/* Grid lines - horizontal */}
               {[0, 1, 2].map((i) => (
                 <line
@@ -503,7 +533,203 @@ export const FinancialCard = ({
             </svg>
           </div>
         </div>
-      </div>
+        </div>
+      )}
+      
+      {/* Mobile Chart Animations Container */}
+      {isMobile && (
+        <div 
+          className="absolute bottom-4 h-[36%] left-0 right-0 w-full" 
+          style={{ zIndex: 0 }}
+        >
+          {/* Loading State */}
+          {isLoading && (
+            <div className="w-full h-full flex items-center justify-center">
+              <svg 
+                className="animate-spin w-8 h-8 text-gray-400" 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 24 24"
+              >
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+          )}
+          
+          {/* Stock Chart Animation */}
+          <div 
+            className="w-full h-36 transition-all duration-300 ease-out"
+          >
+            <div className="relative w-full h-full">
+              <svg
+                ref={svgRef}
+                width={width}
+                height={height}
+                viewBox={`0 0 ${width} ${height}`}
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="absolute top-0 left-1/2 transform -translate-x-1/2"
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                style={{ maxWidth: '100%' }}
+              >
+                {/* Same SVG content as above */}
+                {/* Grid lines - horizontal */}
+                {[0, 1, 2].map((i) => (
+                  <line
+                    key={`grid-${i}`}
+                    x1="0"
+                    y1={height * (i / 2)}
+                    x2={width}
+                    y2={height * (i / 2)}
+                    stroke="#2d3748"
+                    strokeWidth="1"
+                    strokeDasharray="5,5"
+                  />
+                ))}
+
+                {/* Grid lines - vertical */}
+                {[0, 1, 2, 3].map((i) => (
+                  <line
+                    key={`vgrid-${i}`}
+                    x1={width * (i / 3)}
+                    y1="0"
+                    x2={width * (i / 3)}
+                    y2={height}
+                    stroke="#2d3748"
+                    strokeWidth="1"
+                    strokeDasharray="5,5"
+                  />
+                ))}
+
+                {/* Area under the first graph line with sequential reveal */}
+                {normalizedData1.length > 0 && (
+                  <motion.path
+                    d={`${pathData1} L${width},${height} L0,${height} Z`}
+                    fill="url(#greenGradient1-mobile)"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isHovered ? 0.15 : 0 }}
+                    transition={{ duration: 1 }}
+                    clipPath="url(#reveal-mask-mobile)"
+                  />
+                )}
+
+                {/* Area under the second graph line with sequential reveal */}
+                {normalizedData2.length > 0 && (
+                  <motion.path
+                    d={`${pathData2} L${width},${height} L0,${height} Z`}
+                    fill="url(#greenGradient2-mobile)"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isHovered ? 0.15 : 0 }}
+                    transition={{ duration: 1, delay: 0.2 }}
+                    clipPath="url(#reveal-mask-mobile)"
+                  />
+                )}
+
+                {/* Line graphs with left-to-right reveal */}
+                <motion.g>
+                  {/* Mask for revealing the lines from left to right */}
+                  <defs>
+                    <motion.clipPath id="reveal-mask-mobile">
+                      <motion.rect
+                        x="0"
+                        y="0"
+                        width="0"
+                        height={height}
+                        initial={{ width: 0 }}
+                        animate={{ width: isHovered ? width : 0 }}
+                        transition={{ duration: 2, ease: "easeInOut" }}
+                      />
+                    </motion.clipPath>
+                  </defs>
+
+                  {/* Static path for first line */}
+                  <motion.path
+                    d={pathData1}
+                    fill="none"
+                    stroke="url(#greenLineGradient1-mobile)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    clipPath="url(#reveal-mask-mobile)"
+                  />
+
+                  {/* Animated drawing effect for first line */}
+                  <motion.path
+                    d={pathData1}
+                    fill="none"
+                    stroke="url(#greenLineGradient1-mobile)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0, opacity: 1 }}
+                    animate={{ pathLength: isHovered ? 1 : 0, opacity: 0 }}
+                    transition={{ duration: 2.5, ease: "easeInOut" }}
+                    clipPath="url(#reveal-mask-mobile)"
+                  />
+
+                  {/* Static path for second line */}
+                  <motion.path
+                    d={pathData2}
+                    fill="none"
+                    stroke="url(#greenLineGradient2-mobile)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    clipPath="url(#reveal-mask-mobile)"
+                  />
+
+                  {/* Animated drawing effect for second line */}
+                  <motion.path
+                    d={pathData2}
+                    fill="none"
+                    stroke="url(#greenLineGradient2-mobile)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0, opacity: 1 }}
+                    animate={{ pathLength: isHovered ? 1 : 0, opacity: 0 }}
+                    transition={{ duration: 2.5, ease: "easeInOut", delay: 0.2 }}
+                    clipPath="url(#reveal-mask-mobile)"
+                  />
+                </motion.g>
+
+                {/* Mobile-specific gradients */}
+                <defs>
+                  {/* Gradients for first line */}
+                  <linearGradient id="greenGradient1-mobile" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#48bb78" stopOpacity="0.5" />
+                    <stop offset="100%" stopColor="#48bb78" stopOpacity="0" />
+                  </linearGradient>
+                  <linearGradient id="greenLineGradient1-mobile" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#38a169" />
+                    <stop offset="100%" stopColor="#48bb78" />
+                  </linearGradient>
+
+                  {/* Gradients for second line */}
+                  <linearGradient id="greenGradient2-mobile" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#48bb78" stopOpacity="0.5" />
+                    <stop offset="100%" stopColor="#48bb78" stopOpacity="0" />
+                  </linearGradient>
+                  <linearGradient id="greenLineGradient2-mobile" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#38a169" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#48bb78" />
+                  </linearGradient>
+
+                  {/* Glow filter for the traveling highlight */}
+                  <filter id="glow-mobile" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="4" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                </defs>
+              </svg>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }; 

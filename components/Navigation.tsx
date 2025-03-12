@@ -14,6 +14,7 @@ export default function Navigation() {
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isLargeDisplay, setIsLargeDisplay] = useState(false)
 
   // Add scroll event listener
   useEffect(() => {
@@ -29,6 +30,49 @@ export default function Navigation() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Check for large display
+  useEffect(() => {
+    const checkIsLargeDisplay = () => {
+      setIsLargeDisplay(window.innerWidth > 1920)
+    }
+    
+    // Check on mount and when window resizes
+    checkIsLargeDisplay()
+    window.addEventListener('resize', checkIsLargeDisplay)
+    
+    return () => window.removeEventListener('resize', checkIsLargeDisplay)
+  }, [])
+
+  // Special handling for scroll events on large displays
+  useEffect(() => {
+    if (!isLargeDisplay) return
+    
+    // Create a reference to the nav element
+    let navElement: HTMLElement | null = null;
+    
+    const handleScroll = () => {
+      if (!navElement) {
+        // Find the nav element on first scroll
+        navElement = document.querySelector('nav');
+      }
+      
+      if (navElement) {
+        // Ensure consistent height on large displays
+        if (window.scrollY === 0) {
+          // At top - ensure clean layout
+          navElement.style.height = '60px';
+          navElement.style.minHeight = '60px';
+        }
+      }
+    }
+    
+    // Apply initially
+    setTimeout(handleScroll, 0);
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isLargeDisplay]);
 
   // Close mobile menu on navigation
   useEffect(() => {
@@ -95,10 +139,10 @@ export default function Navigation() {
   return (
     <>
       <nav className={`${
-          hasScrolled || pathname !== "/"
+          hasScrolled || pathname !== "/" || isLargeDisplay
             ? "bg-black py-2"
             : "bg-black py-4"
-        } sticky top-0 z-50 transition-all duration-300`}>
+        } sticky top-0 z-50 transition-all duration-300 ${isLargeDisplay ? 'py-3 border-b border-gray-900' : ''}`}>
         {/* This div controls the width constraints and centers the content, matching main page */}
         <div className="mx-auto" style={{ maxWidth: "84rem" }}>
           {/* This div aligns with the vertical lines from the page layout */}
@@ -182,8 +226,8 @@ export default function Navigation() {
               exit="closed"
             >
               <div className="p-6 h-full flex flex-col">
-                <div className="flex justify-between items-center mb-8">
-                  <Logo className="h-7" />
+                <div className="flex justify-between items-center mb-4">
+                  <div className="w-[85px]"></div>
                   <button
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="w-10 h-10 flex items-center justify-center text-white focus:outline-none"
@@ -194,7 +238,7 @@ export default function Navigation() {
                 </div>
                 
                 {/* Mobile Menu Links */}
-                <div className="flex flex-col space-y-5 mt-4">
+                <div className="flex flex-col space-y-5">
                   <Link 
                     href="/" 
                     className={`flex items-center justify-between text-base ${pathname === '/' ? 'text-[#4299e1] font-medium' : 'text-white'} py-2`}

@@ -4,6 +4,19 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Check } from 'lucide-react'
 import { plans } from '@/data/pricing'
 
+// Custom CSS for hide-scrollbar
+const styles = {
+  hideScrollbar: `
+    .hide-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;     /* Firefox */
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;             /* Chrome, Safari and Opera */
+    }
+  `
+};
+
 // Simple canvas-based particle background
 const ParticleBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -78,16 +91,14 @@ const ParticleBackground = () => {
       x: Math.random() * width,
       y: Math.random() * height,
       radius: Math.random() * 2 + 0.8,
-      // Adjusted movement speed
       speedX: (Math.random() - 0.5) * speedFactor,
       speedY: (Math.random() - 0.5) * speedFactor,
-      // Add properties for the floating effect
+      color: blueColors[Math.floor(Math.random() * blueColors.length)],
       originalX: 0,
       originalY: 0,
       wobbleSpeed: Math.random() * wobbleSpeedBase + 0.03,
       wobbleFactor: Math.random() * wobbleFactorBase + wobbleFactorBase,
       wobbleOffset: Math.random() * Math.PI * 2, // Random starting point in the sin wave
-      color: blueColors[Math.floor(Math.random() * blueColors.length)]
     }));
     
     // Store original positions for the subtle floating effect
@@ -380,7 +391,51 @@ const ParticleBackground = () => {
 
 export default function PricingPage() {
   const mainContentRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(0);
+  const [activePlanIndex, setActivePlanIndex] = useState(0);
+  
+  // Handle scroll events in the pricing cards container
+  const handleScroll = useCallback(() => {
+    if (!scrollContainerRef.current) return;
+    
+    const container = scrollContainerRef.current;
+    const scrollLeft = container.scrollLeft;
+    const cardWidth = container.scrollWidth / plans.length;
+    
+    // Calculate which card is most visible
+    const newActiveIndex = Math.round(scrollLeft / cardWidth);
+    
+    if (newActiveIndex !== activePlanIndex) {
+      setActivePlanIndex(newActiveIndex);
+    }
+  }, [activePlanIndex]);
+  
+  // Scroll to a specific card when pagination indicator is clicked
+  const scrollToCard = (index: number) => {
+    if (!scrollContainerRef.current) return;
+    
+    const container = scrollContainerRef.current;
+    const cardWidth = container.scrollWidth / plans.length;
+    
+    container.scrollTo({
+      left: index * cardWidth,
+      behavior: 'smooth'
+    });
+    
+    setActivePlanIndex(index);
+  };
+  
+  // Add scroll event listener to the container
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    
+    container.addEventListener('scroll', handleScroll);
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [handleScroll]);
   
   // Update content height when component mounts and on resize
   useEffect(() => {
@@ -406,6 +461,9 @@ export default function PricingPage() {
   
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-black/50 to-[#0a0a0f]/50">
+      {/* Apply custom CSS */}
+      <style dangerouslySetInnerHTML={{ __html: styles.hideScrollbar }} />
+      
       {/* Particle background with restricted height - only covers main content */}
       <div style={{ 
         position: 'absolute',
@@ -416,23 +474,24 @@ export default function PricingPage() {
         overflow: 'hidden',
         zIndex: 0
       }}>
-        <ParticleBackground />
+      <ParticleBackground />
       </div>
       
       <main ref={mainContentRef} className="relative z-10 pt-20 pb-32">
         {/* Header */}
-        <div className="text-center mb-32">
-          <h1 className="text-4xl md:text-5xl font-semibold text-white mb-4">
+        <div className="text-center mb-16 sm:mb-20 md:mb-32 px-4 sm:px-6 md:px-0">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-white mb-4 max-w-xs sm:max-w-none mx-auto">
             Simple, transparent pricing
           </h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-slate-300 max-w-xs sm:max-w-lg md:max-w-2xl mx-auto">
             Choose the perfect plan for your investment needs
           </p>
         </div>
 
         {/* Pricing Grid */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          {/* Desktop layout - unchanged */}
+          <div className="hidden md:grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {plans.map((plan) => (
               <div
                 key={plan.name}
@@ -499,6 +558,99 @@ export default function PricingPage() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Mobile layout - horizontal scrollable */}
+          <div className="md:hidden">
+            {/* Swipe indicator text */}
+            <div className="text-center mb-4 text-slate-400 text-sm">
+              <span>← Swipe to compare plans →</span>
+            </div>
+            
+            {/* Horizontal scrollable container */}
+            <div 
+              ref={scrollContainerRef}
+              className="flex overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar"
+            >
+              {plans.map((plan, index) => (
+                <div
+                  key={plan.name}
+                  className={`relative flex-shrink-0 w-[85%] mx-2 first:ml-4 last:mr-4
+                    snap-center flex flex-col bg-white/5 backdrop-blur-lg rounded-xl overflow-hidden
+                    transform transition-all duration-300 ease-in-out
+                    shadow-[0_4px_20px_rgba(0,0,0,0.2)]
+                    ${plan.name === 'Plus' ? 
+                      'border-2 border-[#4299e1] shadow-[0_0_25px_rgba(66,153,225,0.2)]' : 
+                      'border border-white/10'}`}
+                >
+                  {plan.nameBadge && (
+                    <div className="absolute top-4 right-4 bg-[#4299e1] text-white text-sm px-3 py-1 rounded-full">
+                      {plan.name === 'Plus' ? 'Recommended' : plan.nameBadge}
+                    </div>
+                  )}
+
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-white mb-2">{plan.name}</h3>
+                    <p className="text-slate-300 text-sm mb-4">{plan.description}</p>
+                    
+                    <div className="flex items-baseline mb-6">
+                      {plan.priceMonthly !== '0' && (
+                        <span className="text-3xl font-bold text-white">$</span>
+                      )}
+                      <span className="text-4xl font-bold text-white">
+                        {plan.priceMonthly === '0' ? '$0' : plan.priceMonthly}
+                      </span>
+                      {(
+                        <span className="ml-2 text-slate-300 text-sm">{plan.costUnit}</span>
+                      )}
+                    </div>
+
+                    <button
+                      className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200
+                        active:scale-[0.98]
+                        ${plan.name === 'Plus'
+                          ? 'bg-[#4299e1] text-white'
+                          : 'bg-white/10 text-white'}`}
+                      onClick={() => {
+                        // Trigger the ContactSlideout to open
+                        const event = new CustomEvent('openWaitlistSlideout');
+                        window.dispatchEvent(event);
+                      }}
+                    >
+                      Join Waitlist
+                    </button>
+                  </div>
+
+                  <div className="p-6 border-t border-white/10 flex-1">
+                    <h4 className="text-white font-medium mb-3 text-sm">Included in this plan:</h4>
+                    <ul className="space-y-3">
+                      {plan.features.map((feature) => (
+                        <li key={typeof feature === 'string' ? feature : feature[0]} className="flex">
+                          <Check className="h-5 w-5 text-[#4299e1] flex-shrink-0" />
+                          <div className="ml-2">
+                            <p className="text-white text-sm">
+                              {typeof feature === 'string' ? feature : feature[0]}
+                            </p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Pagination indicators */}
+            <div className="flex justify-center mt-4 space-x-2">
+              {plans.map((plan, index) => (
+                <div 
+                  key={`indicator-${index}`}
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer
+                    ${index === activePlanIndex ? 'w-6 bg-[#4299e1]' : 'w-2 bg-[#4299e1]/30'}`}
+                  onClick={() => scrollToCard(index)}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </main>
