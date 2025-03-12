@@ -161,17 +161,6 @@ export default function Home() {
               <p className="text-xl text-slate-300 mb-8 break-words px-2 md:px-0">
                 Clera's AI-powered platform offers everything you need to make informed investment decisions at one low monthly fee.
               </p>
-              
-              {/* Mobile-only swipe indicator */}
-              {isMobile && (
-                <div className="flex items-center justify-center text-slate-400 text-sm gap-2 mb-2">
-                  <span>Swipe to explore</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14"></path>
-                    <path d="m12 5 7 7-7 7"></path>
-                  </svg>
-                </div>
-              )}
             </div>
             
             <BentoGrid className="px-4">
@@ -218,6 +207,13 @@ export default function Home() {
                 />
               </div>
             </BentoGrid>
+            
+            {/* Mobile-only navigation instruction - moved below cards */}
+            {isMobile && (
+              <div className="flex items-center justify-center text-slate-400 text-sm gap-2 mt-2 mb-10">
+                <span>Tap arrows to navigate</span>
+              </div>
+            )}
           </div>
           
           {/* Waitlist section */}

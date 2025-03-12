@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { motion, useInView } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Mobile dots indicator component for the carousel
 export const MobileDotsIndicator = ({ 
@@ -35,6 +36,7 @@ export const BentoGrid = ({
   const [currentSlide, setCurrentSlide] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const childrenArray = Array.isArray(children) ? children : [children];
+  const totalSlides = childrenArray.length;
 
   // Detect if on mobile device
   useEffect(() => {
@@ -48,6 +50,38 @@ export const BentoGrid = ({
     
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
+
+  // Navigation functions for arrow buttons
+  const navigateToSlide = (slideIndex: number) => {
+    if (!scrollContainerRef.current) return;
+    
+    // Keep the index within bounds
+    const targetIndex = Math.max(0, Math.min(slideIndex, totalSlides - 1));
+    
+    // Calculate the scroll position
+    const container = scrollContainerRef.current;
+    const slideWidth = container.offsetWidth * 0.85; // 85% width per slide
+    // Adjust for the first slide which is 95% wide
+    const scrollPosition = targetIndex === 0 
+      ? 0 
+      : slideWidth + (targetIndex - 1) * slideWidth;
+    
+    // Smooth scroll to that position
+    container.scrollTo({
+      left: scrollPosition,
+      behavior: 'smooth'
+    });
+    
+    setCurrentSlide(targetIndex);
+  };
+
+  const goToNextSlide = () => {
+    navigateToSlide(currentSlide + 1);
+  };
+
+  const goToPrevSlide = () => {
+    navigateToSlide(currentSlide - 1);
+  };
 
   // Track scroll position to update current slide indicator
   useEffect(() => {
@@ -84,6 +118,7 @@ export const BentoGrid = ({
         style={isMobile ? {
           scrollbarWidth: 'none', /* Firefox */
           msOverflowStyle: 'none', /* IE and Edge */
+          scrollBehavior: 'smooth'
         } : {}}
       >
         {isMobile 
@@ -98,6 +133,35 @@ export const BentoGrid = ({
           : children
         }
       </div>
+      
+      {/* Mobile view with arrow navigation - moved to bottom */}
+      {isMobile && (
+        <div className="relative mt-2 mb-5">
+          {/* Left Navigation Arrow */}
+          <button 
+            onClick={goToPrevSlide}
+            className={`absolute left-8 top-0 z-20 bg-black/70 backdrop-blur-sm rounded-full px-5 py-3 text-white border border-white/20 transition-opacity duration-300 ${
+              currentSlide === 0 ? 'opacity-30 cursor-not-allowed' : 'opacity-90 hover:opacity-100'
+            }`}
+            disabled={currentSlide === 0}
+            aria-label="Previous card"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          
+          {/* Right Navigation Arrow */}
+          <button 
+            onClick={goToNextSlide}
+            className={`absolute right-8 top-0 z-20 bg-black/70 backdrop-blur-sm rounded-full px-5 py-3 text-white border border-white/20 transition-opacity duration-300 ${
+              currentSlide === totalSlides - 1 ? 'opacity-30 cursor-not-allowed' : 'opacity-90 hover:opacity-100'
+            }`}
+            disabled={currentSlide === totalSlides - 1}
+            aria-label="Next card"
+          >
+            <ChevronRight size={24} />
+          </button>
+        </div>
+      )}
       
       {/* Show dots indicator only on mobile */}
       {isMobile && childrenArray.length > 1 && (
