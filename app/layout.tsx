@@ -70,6 +70,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark bg-black">
+      <head>
+        {/* This specific tag helps Google use the circular favicon in search results */}
+        <link rel="icon" type="image/png" href="/clera-favicon-circle.png" media="(prefers-color-scheme: light)" />
+        <link rel="icon" type="image/png" href="/clera-favicon-circle.png" media="(prefers-color-scheme: dark)" />
+      </head>
       <body className={`${inter.variable} font-sans antialiased bg-black overflow-x-hidden`}>
         <div id="top"></div>
         <Navigation />
