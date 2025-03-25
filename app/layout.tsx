@@ -55,8 +55,8 @@ export const metadata = {
     },
   },
   icons: {
-    icon: '/clera-favicon.png',
-    apple: '/clera-favicon.png',
+    icon: '/clera-circle.png',
+    apple: '/clera-circle.png',
   },
   alternates: {
     canonical: 'https://askclera.com',
@@ -70,6 +70,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark bg-black">
+      <head>
+        <link rel="icon" href="/clera-circle.png" type="image/png" />
+      </head>
       <body className={`${inter.variable} font-sans antialiased bg-black overflow-x-hidden`}>
         <div id="top"></div>
         <Navigation />
