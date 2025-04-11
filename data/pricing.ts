@@ -17,7 +17,7 @@ export const plans = [
   {
     name: 'Plus',
     description: 'For growing investors seeking better returns',
-    priceMonthly: '15',
+    priceMonthly: '4.99',
     costUnit: '/month',
     href: '/waitlist',
     cta: 'Get Started',
