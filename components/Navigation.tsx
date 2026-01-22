@@ -3,15 +3,12 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Button } from '@/components/ui/button'
 import Logo from './Logo'
-import ContactSlideout from './ContactSlideout'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ChevronRight } from 'lucide-react'
 
 export default function Navigation() {
   const pathname = usePathname()
-  const [isContactOpen, setIsContactOpen] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isLargeDisplay, setIsLargeDisplay] = useState(false)
@@ -78,16 +75,6 @@ export default function Navigation() {
   useEffect(() => {
     setIsMobileMenuOpen(false)
   }, [pathname])
-
-  // Listen for custom event to open waitlist slideout
-  useEffect(() => {
-    const handleOpenWaitlist = () => {
-      setIsContactOpen(true)
-    }
-
-    window.addEventListener('openWaitlistSlideout', handleOpenWaitlist)
-    return () => window.removeEventListener('openWaitlistSlideout', handleOpenWaitlist)
-  }, [])
 
   // Close mobile menu on escape key
   useEffect(() => {
@@ -171,17 +158,12 @@ export default function Navigation() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setIsContactOpen(true)}
-                    className={`relative px-4 py-1 text-sm transition-all duration-300 ease-in-out transform group-hover:scale-102
-                      ${isContactOpen 
-                        ? 'bg-[#4299e1] text-white border-[#4299e1]' 
-                        : 'bg-transparent border-[#4299e1] text-[#4299e1] hover:text-white hover:bg-[#4299e1]'
-                      }`}
+                  <Link
+                    href="https://app.askclera.com/"
+                    className="relative inline-flex items-center justify-center rounded-md border border-[#4299e1] bg-transparent px-4 py-1 text-sm text-[#4299e1] transition-all duration-300 ease-in-out transform group-hover:scale-102 hover:text-white hover:bg-[#4299e1]"
                   >
-                    Join Waitlist
-                  </Button>
+                    Try it
+                  </Link>
                 </motion.div>
               </div>
             </div>
@@ -258,16 +240,14 @@ export default function Navigation() {
                 
                 {/* Mobile CTA */}
                 <div className="mt-auto pb-6">
-                  <Button 
-                    onClick={() => {
-                      setIsMobileMenuOpen(false)
-                      setIsContactOpen(true)
-                    }}
+                  <Link
+                    href="https://app.askclera.com/"
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="w-full bg-[#4299e1] hover:bg-[#4299e1]/90 text-white py-3 rounded-lg flex items-center justify-center space-x-2"
                   >
-                    <span>Join Waitlist</span>
+                    <span>Try it</span>
                     <ChevronRight size={16} />
-                  </Button>
+                  </Link>
                 </div>
               </div>
             </motion.div>
@@ -275,10 +255,6 @@ export default function Navigation() {
         )}
       </AnimatePresence>
 
-      <ContactSlideout 
-        isOpen={isContactOpen}
-        onClose={() => setIsContactOpen(false)}
-      />
     </>
   )
 } 

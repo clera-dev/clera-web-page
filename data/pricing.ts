@@ -4,8 +4,8 @@ export const plans = [
     description: 'Perfect for trying out AI-powered investing',
     priceMonthly: '0',
     costUnit: '/month',
-    href: '/waitlist',
-    cta: 'Get Started',
+    href: 'https://app.askclera.com/',
+    cta: 'Try it',
     features: [
       'Unlimited access to commission free trading on Clera',
       'Limit of 8 basic investment suggestions from Clera per month',
@@ -19,8 +19,8 @@ export const plans = [
     description: 'For growing investors seeking better returns',
     priceMonthly: '4.99',
     costUnit: '/month',
-    href: '/waitlist',
-    cta: 'Get Started',
+    href: 'https://app.askclera.com/',
+    cta: 'Try it',
     nameBadge: 'Most Popular',
     features: [
       'Everything in the Clera Free plan, plus:',
@@ -38,8 +38,8 @@ export const plans = [
     description: 'Our most powerful features - Coming Soon',
     priceMonthly: 'TBA',
     costUnit: '/month',
-    href: '/waitlist',
-    cta: 'Join Waitlist',
+    href: 'https://app.askclera.com/',
+    cta: 'Try it',
     nameBadge: 'Coming Soon',
     features: [
       'Everything in the Clera Plus plan, plus:',

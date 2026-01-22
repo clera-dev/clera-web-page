@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Check } from 'lucide-react'
+import Link from 'next/link'
 import { plans } from '@/data/pricing'
 
 // Custom CSS for hide-scrollbar
@@ -525,20 +526,16 @@ export default function PricingPage() {
                     )}
                   </div>
 
-                  <button
+                  <Link
+                    href="https://app.askclera.com/"
                     className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200
                       transform hover:scale-[1.02] active:scale-[0.98]
                       ${plan.name === 'Plus'
                         ? 'bg-[#4299e1] text-white hover:bg-[#63b3ff]'
                         : 'bg-white/10 text-white hover:bg-white/20'}`}
-                    onClick={() => {
-                      // Trigger the ContactSlideout to open
-                      const event = new CustomEvent('openWaitlistSlideout');
-                      window.dispatchEvent(event);
-                    }}
                   >
-                    Join Waitlist
-                  </button>
+                    Try it
+                  </Link>
                 </div>
 
                 <div className="p-8 border-t border-white/10 flex-1">
@@ -605,20 +602,16 @@ export default function PricingPage() {
                       )}
                     </div>
 
-                    <button
+                    <Link
+                      href="https://app.askclera.com/"
                       className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200
                         active:scale-[0.98]
                         ${plan.name === 'Plus'
                           ? 'bg-[#4299e1] text-white'
                           : 'bg-white/10 text-white'}`}
-                      onClick={() => {
-                        // Trigger the ContactSlideout to open
-                        const event = new CustomEvent('openWaitlistSlideout');
-                        window.dispatchEvent(event);
-                      }}
                     >
-                      Join Waitlist
-                    </button>
+                      Try it
+                    </Link>
                   </div>
 
                   <div className="p-6 border-t border-white/10 flex-1">

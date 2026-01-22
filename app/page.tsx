@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import BackgroundChart from '@/components/BackgroundChart'
 import TickerBanner from '@/components/TickerBanner'
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import FeatureCard from "@/components/FeatureCard"
 import { features } from "@/data/features"
@@ -133,27 +132,23 @@ export default function Home() {
                 delay: 0.6
               }}
             >
-              <Button 
-                className="w-full sm:w-64 bg-white text-black border-2 border-black px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-medium shadow-[0_0_0_2px_rgba(0,0,0,1)] transition-colors duration-300 hover:bg-black hover:text-white hover:border-white hover:shadow-[0_0_0_2px_rgba(255,255,255,1)]"
+              <Link
+                href="https://app.askclera.com/"
+                className="inline-flex w-full sm:w-64 items-center justify-center bg-white text-black border-2 border-black px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-medium shadow-[0_0_0_2px_rgba(0,0,0,1)] transition-colors duration-300 hover:bg-black hover:text-white hover:border-white hover:shadow-[0_0_0_2px_rgba(255,255,255,1)]"
                 style={{ borderRadius: '50px' }}
-                onClick={() => {
-                  // Find the ContactSlideout component and open it
-                  const event = new CustomEvent('openWaitlistSlideout');
-                  window.dispatchEvent(event);
-                }}
               >
-                Join Waitlist
-              </Button>
+                Try it
+              </Link>
             </motion.div>
           </div>
           
           {/* Add Ticker Banner below the hero section */}
-          <div className="w-full mt-64 sm:-mt-[8.25rem] mb-16 sm:mb-32 relative" style={{ zIndex: 2 }}>
+          <div className="w-full mt-12 sm:-mt-[8.25rem] mb-12 sm:mb-32 relative" style={{ zIndex: 2 }}>
             <TickerBanner />
           </div>
           
           {/* Features section */}
-          <div className="pt-16 pb-48 w-full">
+          <div className="pt-12 sm:pt-16 pb-24 sm:pb-48 w-full">
             <div className="text-center max-w-4xl mx-auto mb-16">
               <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight leading-none mx-auto flex justify-center">
                 <span className="whitespace-normal md:whitespace-nowrap">Powerful and Smart Investing Made Simple</span>
@@ -216,12 +211,12 @@ export default function Home() {
             )}
           </div>
           
-          {/* Waitlist section */}
-          <div className="py-24 w-full bg-gradient-to-b from-transparent to-[#080810]">
-            <div className="container mx-auto px-8">
+          {/* Call to action section */}
+          <div className="py-20 sm:py-24 w-full bg-gradient-to-b from-transparent to-[#080810]">
+            <div className="container mx-auto px-4 sm:px-8">
               <div className="text-center max-w-4xl mx-auto mb-16">
                 <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                  Join the <span className="text-[#4299e1]">Clera</span> Waitlist
+                  Try <span className="text-[#4299e1]">Clera</span> today
                 </h2>
               </div>
               
@@ -231,19 +226,15 @@ export default function Home() {
                   <div className="absolute -top-10 -left-10 w-32 h-32 bg-[#4299e1]/20 rounded-full blur-3xl"></div>
                   <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#4299e1]/20 rounded-full blur-3xl"></div>
                   
-                  {/* Waitlist Button */}
+                  {/* CTA Button */}
                   <div className="relative z-10 flex justify-center">
-                    <Button 
-                      className="w-64 bg-white text-black border-2 border-black px-8 py-6 text-lg font-medium shadow-[0_0_0_2px_rgba(0,0,0,0.5)] transition-all duration-300 hover:bg-black hover:text-white hover:border-white hover:shadow-[0_0_0_2px_rgba(255,255,255,0.5)]"
+                    <Link
+                      href="https://app.askclera.com/"
+                      className="inline-flex w-64 items-center justify-center bg-white text-black border-2 border-black px-8 py-6 text-lg font-medium shadow-[0_0_0_2px_rgba(0,0,0,0.5)] transition-all duration-300 hover:bg-black hover:text-white hover:border-white hover:shadow-[0_0_0_2px_rgba(255,255,255,0.5)]"
                       style={{ borderRadius: '50px' }}
-                      onClick={() => {
-                        // Find the ContactSlideout component and open it
-                        const event = new CustomEvent('openWaitlistSlideout');
-                        window.dispatchEvent(event);
-                      }}
                     >
-                      Join Waitlist
-                    </Button>
+                      Try it
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -254,21 +245,21 @@ export default function Home() {
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                   </svg>
-                  <span>Early Access</span>
+                  <span>Instant Access</span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-300">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#4299e1]">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                   </svg>
-                  <span>Exclusive Updates</span>
+                  <span>AI Insights</span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-300">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#4299e1]">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                   </svg>
-                  <span>Priority Support</span>
+                  <span>Portfolio Support</span>
                 </div>
               </div>
             </div>
