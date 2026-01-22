@@ -103,7 +103,7 @@ export const FinancialCard = ({
 
   // Chart dimensions - make responsive for mobile
   const width = 600;
-  const height = isMobile ? 100 : 120; // Smaller height on mobile
+  const height = isMobile ? 140 : 120; // Larger mobile chart for better balance
 
   useEffect(() => {
     // Generate data with different characteristics for each line
@@ -158,7 +158,7 @@ export const FinancialCard = ({
     <motion.div
       ref={ref}
       className={cn(
-        "row-span-1 rounded-xl group/card hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-6 dark:bg-[#0a0a0f]/60 dark:border-white/[0.1] backdrop-blur-sm border border-white/5 justify-between flex flex-col relative overflow-hidden h-full",
+        "row-span-1 rounded-xl group/card hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-4 sm:p-6 dark:bg-[#0a0a0f]/60 dark:border-white/[0.1] backdrop-blur-sm border border-white/5 justify-between flex flex-col relative overflow-hidden h-full",
         className
       )}
       whileHover={{ 
@@ -214,12 +214,12 @@ export const FinancialCard = ({
             {title}
           </div>
         </div>
-        <div className={`font-normal text-slate-400 ${isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed'} ${isMobile ? 'mb-20' : 'mb-4'}`}>
+        <div className={`font-normal text-slate-400 ${isMobile ? 'text-xs leading-snug' : (isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed')} mb-4`}>
           {description}
         </div>
         
         {/* Spacer that pushes content up to make room for chart */}
-        <div className={`flex-grow ${isMobile ? 'min-h-[240px]' : ''}`}></div>
+        <div className={`flex-grow ${isMobile ? 'min-h-[120px]' : ''}`}></div>
       </div>
       
       {/* Desktop Chart Animation */}
@@ -538,7 +538,7 @@ export const FinancialCard = ({
       {/* Mobile Chart Animations Container */}
       {isMobile && (
         <div 
-          className="absolute bottom-4 h-[36%] left-0 right-0 w-full" 
+          className="absolute bottom-3 h-[45%] left-0 right-0 w-full" 
           style={{ zIndex: 0 }}
         >
           {/* Loading State */}
@@ -558,7 +558,7 @@ export const FinancialCard = ({
           
           {/* Stock Chart Animation */}
           <div 
-            className="w-full h-36 transition-all duration-300 ease-out"
+            className="w-full h-full transition-all duration-300 ease-out"
           >
             <div className="relative w-full h-full">
               <svg

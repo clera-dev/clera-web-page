@@ -105,7 +105,7 @@ export const SecurityCard = ({
           isHovered={isHovered}
         />
         
-        <div className="relative z-10 p-6 h-full flex flex-col">
+        <div className="relative z-10 p-4 sm:p-6 h-full flex flex-col">
           <div className="flex items-center mb-5 relative z-20">
             <motion.div 
               className="w-12 h-12 rounded-lg bg-transparent/10 backdrop-blur-sm flex items-center justify-center border border-white/40 group-hover/card:bg-red-600/90 group-hover/card:border-red-500 transition-all duration-500 ease-in-out"
@@ -127,12 +127,12 @@ export const SecurityCard = ({
             <h3 className="font-bold text-white ml-3 text-xl group-hover/card:text-red-50 transition-colors duration-500">{title}</h3>
           </div>
           
-          <div className={`font-normal text-slate-400 text-sm leading-relaxed relative z-20 ${isMobile ? 'mb-20' : ''}`}>
+          <div className={`font-normal text-slate-400 ${isMobile ? 'text-xs leading-snug' : 'text-sm leading-relaxed'} relative z-20 mb-4`}>
             {description}
           </div>
           
           {/* Spacer that pushes content up to make room for security animation */}
-          <div className={`flex-grow ${isMobile ? 'min-h-[240px]' : ''}`}></div>
+          <div className={`flex-grow ${isMobile ? 'min-h-[120px]' : ''}`}></div>
         </div>
       </motion.div>
     </div>

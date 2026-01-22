@@ -119,7 +119,7 @@ export const BentoGrid = ({
                 className="w-full"
                 style={{ 
                   height: 'auto',
-                  minHeight: '400px',
+                  minHeight: '280px',
                 }}
               >
                 {child}

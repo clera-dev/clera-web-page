@@ -150,7 +150,7 @@ export const PersonalAdvisorCard = ({
   return (
     <motion.div
       className={cn(
-        "row-span-1 rounded-xl group/card hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-6 dark:bg-[#0a0a0f]/60 dark:border-white/[0.1] backdrop-blur-sm border border-white/5 justify-between flex flex-col relative overflow-hidden h-full",
+        "row-span-1 rounded-xl group/card hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-4 sm:p-6 dark:bg-[#0a0a0f]/60 dark:border-white/[0.1] backdrop-blur-sm border border-white/5 justify-between flex flex-col relative overflow-hidden h-full",
         className
       )}
       whileHover={{ 
@@ -204,16 +204,16 @@ export const PersonalAdvisorCard = ({
               {icon}
             </div>
           </div>
-          <div className={`font-bold text-white ml-3 ${isLarge ? 'text-2xl' : 'text-xl'} flex-grow`}>
+          <div className={`font-bold text-white ml-3 ${isMobile ? 'text-lg' : (isLarge ? 'text-2xl' : 'text-xl')} flex-grow`}>
             {title}
           </div>
         </div>
-        <div className={`font-normal text-slate-400 ${isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed'} ${isMobile ? 'mb-6' : 'mb-4'}`}>
+        <div className={`font-normal text-slate-400 ${isMobile ? 'text-xs leading-tight' : (isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed')} ${isMobile ? 'mb-2' : 'mb-4'}`}>
           {description}
         </div>
         
         {/* Spacer that pushes content up to make room for chat interface */}
-        <div className={`flex-grow ${isMobile ? 'min-h-[240px]' : ''}`}></div>
+        <div className={`flex-grow ${isMobile ? 'min-h-[120px]' : ''}`}></div>
       </div>
       
       {/* Redesigned Chat Interface that matches the image */}
@@ -254,45 +254,22 @@ export const PersonalAdvisorCard = ({
         )}
         
         {/* Chat Interface that matches the image - with fixed positioning for mobile */}
-        <div className={`absolute ${isMobile ? 'bottom-0' : 'bottom-0'} left-0 right-0 w-full max-w-full ${isMobile ? 'h-[200px]' : 'h-[400px]'} ${isMobile ? 'flex flex-col' : 'flex flex-col justify-between'} p-4 z-[10] ${isMobile ? 'mt-[200px]' : 'mt-[120px]'} overflow-x-hidden`}>
+        <div className={`absolute ${isMobile ? 'bottom-[60px]' : 'bottom-0'} left-0 right-0 w-full max-w-full ${isMobile ? 'h-[80px]' : 'h-[400px]'} ${isMobile ? 'flex flex-col justify-end' : 'flex flex-col justify-between'} px-4 z-[10] overflow-x-hidden`}>
           {/* Chat messages area - adjusted to ensure messages are visible */}
-          <div className={`${isMobile ? 'absolute top-[10px] left-4 right-4 overflow-visible h-[130px]' : 'flex-grow flex flex-col space-y-4 overflow-y-auto overflow-x-hidden pb-2 max-h-[340px]'}`}>
+          <div className={`${isMobile ? 'flex flex-col space-y-1' : 'flex-grow flex flex-col space-y-4 overflow-y-auto overflow-x-hidden pb-2 max-h-[340px]'}`}>
             {isMobile ? (
-              // Mobile-specific rendering for better control
+              // Mobile-specific rendering - just show user message
               <>
-                {/* User question */}
+                {/* User question only - keep it simple */}
                 {activeMessageIndex >= 0 && (
                   <motion.div 
-                    className="flex justify-end mb-3"
+                    className="flex justify-end"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="bg-gray-500/60 text-white rounded-3xl px-4 py-2 max-w-[90%] text-xs">
+                    <div className="bg-gray-500/60 text-white rounded-3xl px-3 py-1.5 max-w-[85%] text-[11px]">
                       {conversation[0].user}
-                    </div>
-                  </motion.div>
-                )}
-                
-                {/* Clera's response */}
-                {activeMessageIndex >= 1 && (
-                  <motion.div 
-                    className="flex justify-start"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="bg-[#1d1d1d] text-white rounded-3xl px-4 py-2 max-w-[90%] text-xs">
-                      {/* Changed to "Clera is thinking..." with animated dots */}
-                      <em>Clera is thinking</em>
-                      <motion.span
-                        animate={{ opacity: [0, 1, 0] }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: 1.5,
-                          ease: "easeInOut",
-                        }}
-                      >...</motion.span>
                     </div>
                   </motion.div>
                 )}

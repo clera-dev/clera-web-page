@@ -120,7 +120,7 @@ export default function Home() {
                 delay: 0.3
               }}
             >
-              Investing made simple: Clera delivers personalized, Wall Street-level advice and manages your investments—all for one low, affordable monthly price.
+              Investing made simple. Clera delivers personalized, Wall Street-level advice and manages your investments, all for one low monthly price.
             </motion.p>
             
             <motion.div

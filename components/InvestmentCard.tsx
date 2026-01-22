@@ -59,7 +59,7 @@ export const InvestmentCard = ({
     <motion.div
       ref={ref}
       className={cn(
-        "row-span-1 rounded-xl group/card hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-6 dark:bg-[#0a0a0f]/60 dark:border-white/[0.1] backdrop-blur-sm border border-white/5 justify-between flex flex-col relative overflow-hidden h-full",
+        "row-span-1 rounded-xl group/card hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-4 sm:p-6 dark:bg-[#0a0a0f]/60 dark:border-white/[0.1] backdrop-blur-sm border border-white/5 justify-between flex flex-col relative overflow-hidden h-full",
         className
       )}
       whileHover={{ 
@@ -111,23 +111,25 @@ export const InvestmentCard = ({
             {title}
           </div>
         </div>
-        <div className={`font-normal text-slate-400 ${isMobile ? 'text-sm' : (isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed')} leading-relaxed ${isMobile ? 'mb-20' : 'mb-4'}`}>
+        <div className={`font-normal text-slate-400 ${isMobile ? 'text-xs leading-snug' : (isLarge ? 'text-base leading-relaxed' : 'text-sm leading-relaxed')} mb-4`}>
           {description}
         </div>
         
-        {/* Portfolio value display - top right - only visible on hover */}
-        <motion.div 
-          className={`absolute ${isMobile ? 'top-64' : 'top-6'} right-6 text-right`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isHovered ? 1 : 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-        >
-          <div className="text-xs text-white/60 mb-1">PORTFOLIO VALUE</div>
-          <div className="text-lg font-bold text-[#7e57c2]">$34,913.00</div>
-        </motion.div>
+        {/* Portfolio value display - top right - only visible on hover - DESKTOP ONLY */}
+        {!isMobile && (
+          <motion.div 
+            className="absolute top-6 right-6 text-right"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isHovered ? 1 : 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
+            <div className="text-xs text-white/60 mb-1">PORTFOLIO VALUE</div>
+            <div className="text-lg font-bold text-[#7e57c2]">$34,913.00</div>
+          </motion.div>
+        )}
         
         {/* Spacer that pushes content up to make room for chart */}
-        <div className={`flex-grow ${isMobile ? 'min-h-[240px]' : ''}`}></div>
+        <div className={`flex-grow ${isMobile ? 'min-h-[120px]' : ''}`}></div>
       </div>
       
       {/* 3D Bar Chart Animation */}
@@ -135,7 +137,7 @@ export const InvestmentCard = ({
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0a0f]/80 to-[#0a0a0f]/20 z-[9]"></div>
         
         {/* Chart container */}
-        <div className="absolute bottom-0 left-0 right-0 h-[60%] flex items-end justify-center z-[10] px-6 pb-12">
+        <div className={`absolute bottom-0 left-0 right-0 ${isMobile ? 'h-[50%] pb-8' : 'h-[60%] pb-12'} flex items-end justify-center z-[10] px-6`}>
           <div className="relative w-full h-full flex items-end justify-around">
             {/* X and Y Axes - subtle purple lines - only visible on hover */}
             <motion.div 
