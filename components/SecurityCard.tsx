@@ -87,7 +87,7 @@ export const SecurityCard = ({
         onMouseEnter={() => !isMobile && setIsHovered(true)}
         onMouseLeave={() => !isMobile && setIsHovered(false)}
         onTouchStart={() => isMobile && setIsHovered(true)}
-        className={`group/card rounded-xl w-full relative overflow-hidden bg-[#0a0a0f]/60 backdrop-blur-sm border border-white/5 ${isMobile ? "h-[480px]" : "h-full"}`}
+        className="group/card rounded-xl w-full h-full relative overflow-hidden bg-[#0a0a0f]/60 backdrop-blur-sm border border-white/5"
         whileHover={{ 
           y: -5,
           boxShadow: '0 10px 30px -15px rgba(220, 38, 38, 0.4)',

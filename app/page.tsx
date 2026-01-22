@@ -203,12 +203,6 @@ export default function Home() {
               </div>
             </BentoGrid>
             
-            {/* Mobile-only navigation instruction - moved below cards */}
-            {isMobile && (
-              <div className="flex items-center justify-center text-slate-400 text-sm gap-2 mt-2 mb-10">
-                <span>Tap arrows to navigate</span>
-              </div>
-            )}
           </div>
           
           {/* Call to action section */}

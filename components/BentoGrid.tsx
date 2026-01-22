@@ -58,16 +58,12 @@ export const BentoGrid = ({
     // Keep the index within bounds
     const targetIndex = Math.max(0, Math.min(slideIndex, totalSlides - 1));
     
-    // Calculate the scroll position
-    const container = scrollContainerRef.current;
-    const slideWidth = container.offsetWidth * 0.85; // 85% width per slide
-    // Adjust for the first slide which is 95% wide
-    const scrollPosition = targetIndex === 0 
-      ? 0 
-      : slideWidth + (targetIndex - 1) * slideWidth;
+    // Calculate the scroll position - each card is (100vw - 32px) + 16px margin
+    const cardWidth = window.innerWidth - 32 + 16; // card width + margin
+    const scrollPosition = targetIndex * cardWidth;
     
     // Smooth scroll to that position
-    container.scrollTo({
+    scrollContainerRef.current.scrollTo({
       left: scrollPosition,
       behavior: 'smooth'
     });
@@ -92,18 +88,18 @@ export const BentoGrid = ({
     const handleScroll = () => {
       if (!scrollContainer) return;
       
-      const slideWidth = scrollContainer.offsetWidth * 0.85; // 85% width per slide
+      const cardWidth = window.innerWidth - 32 + 16; // card width + margin
       const scrollPosition = scrollContainer.scrollLeft;
-      const newCurrentSlide = Math.round(scrollPosition / slideWidth);
+      const newCurrentSlide = Math.round(scrollPosition / cardWidth);
       
-      setCurrentSlide(newCurrentSlide);
+      setCurrentSlide(Math.min(newCurrentSlide, totalSlides - 1));
     };
 
     scrollContainer.addEventListener('scroll', handleScroll);
     return () => scrollContainer.removeEventListener('scroll', handleScroll);
-  }, [isMobile]);
+  }, [isMobile, totalSlides]);
 
-  // On mobile: horizontal scrollable carousel
+  // On mobile: vertical stack layout
   // On desktop: standard grid layout
   return (
     <>
@@ -111,21 +107,20 @@ export const BentoGrid = ({
         ref={scrollContainerRef}
         className={cn(
           isMobile
-          ? "flex overflow-x-auto snap-x snap-mandatory py-4 gap-4 scroll-smooth hide-scrollbar"
+          ? "flex flex-col gap-6 px-4"
           : "grid md:auto-rows-[18rem] grid-cols-1 md:grid-cols-3 gap-4 max-w-7xl mx-auto",
           className
         )}
-        style={isMobile ? {
-          scrollbarWidth: 'none', /* Firefox */
-          msOverflowStyle: 'none', /* IE and Edge */
-          scrollBehavior: 'smooth'
-        } : {}}
       >
         {isMobile 
           ? childrenArray.map((child, index) => (
               <div 
                 key={index} 
-                className={`snap-center flex-shrink-0 ${index === 0 ? 'w-[95%]' : 'w-[85%]'} first:pl-4 last:pr-4 h-[60vh] max-h-[520px] min-h-[360px]`}
+                className="w-full"
+                style={{ 
+                  height: 'auto',
+                  minHeight: '400px',
+                }}
               >
                 {child}
               </div>
@@ -133,43 +128,6 @@ export const BentoGrid = ({
           : children
         }
       </div>
-      
-      {/* Mobile view with arrow navigation - moved to bottom */}
-      {isMobile && (
-        <div className="relative mt-2 mb-5">
-          {/* Left Navigation Arrow */}
-          <button 
-            onClick={goToPrevSlide}
-            className={`absolute left-8 top-0 z-20 bg-black/70 backdrop-blur-sm rounded-full px-5 py-3 text-white border border-white/20 transition-opacity duration-300 ${
-              currentSlide === 0 ? 'opacity-30 cursor-not-allowed' : 'opacity-90 hover:opacity-100'
-            }`}
-            disabled={currentSlide === 0}
-            aria-label="Previous card"
-          >
-            <ChevronLeft size={24} />
-          </button>
-          
-          {/* Right Navigation Arrow */}
-          <button 
-            onClick={goToNextSlide}
-            className={`absolute right-8 top-0 z-20 bg-black/70 backdrop-blur-sm rounded-full px-5 py-3 text-white border border-white/20 transition-opacity duration-300 ${
-              currentSlide === totalSlides - 1 ? 'opacity-30 cursor-not-allowed' : 'opacity-90 hover:opacity-100'
-            }`}
-            disabled={currentSlide === totalSlides - 1}
-            aria-label="Next card"
-          >
-            <ChevronRight size={24} />
-          </button>
-        </div>
-      )}
-      
-      {/* Show dots indicator only on mobile */}
-      {isMobile && childrenArray.length > 1 && (
-        <MobileDotsIndicator 
-          totalSlides={childrenArray.length} 
-          currentSlide={currentSlide} 
-        />
-      )}
     </>
   );
 };
