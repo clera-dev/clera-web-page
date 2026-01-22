@@ -253,65 +253,72 @@ export const PersonalAdvisorCard = ({
           </div>
         )}
         
-        {/* Chat Interface that matches the image - with fixed positioning for mobile */}
-        <div className={`absolute ${isMobile ? 'bottom-[60px]' : 'bottom-0'} left-0 right-0 w-full max-w-full ${isMobile ? 'h-[80px]' : 'h-[400px]'} ${isMobile ? 'flex flex-col justify-end' : 'flex flex-col justify-between'} px-4 z-[10] overflow-x-hidden`}>
-          {/* Chat messages area - adjusted to ensure messages are visible */}
-          <div className={`${isMobile ? 'flex flex-col space-y-1' : 'flex-grow flex flex-col space-y-4 overflow-y-auto overflow-x-hidden pb-2 max-h-[340px]'}`}>
-            {isMobile ? (
-              // Mobile-specific rendering - just show user message
-              <>
-                {/* User question only - keep it simple */}
-                {activeMessageIndex >= 0 && (
-                  <motion.div 
-                    className="flex justify-end"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="bg-gray-500/60 text-white rounded-3xl px-3 py-1.5 max-w-[85%] text-[11px]">
-                      {conversation[0].user}
-                    </div>
-                  </motion.div>
-                )}
-              </>
-            ) : (
-              // Desktop version remains unchanged
-              conversation.map((exchange, index) => (
-                <React.Fragment key={index}>
-                  {/* User message */}
-                  <AnimatePresence>
-                    {shouldShowMessage(index * 2, index) && (
-                      <motion.div 
-                        className="flex justify-end"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <div className="bg-gray-500/60 text-white rounded-3xl px-4 py-2 max-w-[90%] text-sm">
-                          {exchange.user}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+        {/* Mobile chat message - positioned separately above the Ask Clera bar */}
+        {isMobile && activeMessageIndex >= 0 && (
+          <div className="absolute bottom-[120px] right-4 left-4 flex flex-col gap-2 z-[11]">
+            <motion.div 
+              className="flex justify-end"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="bg-gray-500/60 text-white rounded-2xl px-3 py-1.5 max-w-[75%] text-[10px] leading-snug">
+                {conversation[0].user}
+              </div>
+            </motion.div>
+            <motion.div 
+              className="flex justify-start"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
+              <div className="bg-[#1d1d1d] text-white rounded-2xl px-3 py-1.5 max-w-[75%] text-[10px] leading-snug">
+                Tech is down after rates moved up today. Want me to break down your top positions?
+              </div>
+            </motion.div>
+          </div>
+        )}
+        
+        {/* Chat Interface - Desktop only for full conversation */}
+        <div className={`absolute bottom-0 left-0 right-0 w-full max-w-full ${isMobile ? 'h-[60px]' : 'h-[400px]'} flex flex-col ${isMobile ? '' : 'justify-between'} px-4 z-[10] overflow-x-hidden`}>
+          {/* Chat messages area - Desktop only */}
+          <div className={`${isMobile ? 'hidden' : 'flex-grow flex flex-col space-y-4 overflow-y-auto overflow-x-hidden pb-2 max-h-[340px]'}`}>
+            {/* Desktop conversation */}
+            {conversation.map((exchange, index) => (
+              <React.Fragment key={index}>
+                {/* User message */}
+                <AnimatePresence>
+                  {shouldShowMessage(index * 2, index) && (
+                    <motion.div 
+                      className="flex justify-end"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="bg-gray-500/60 text-white rounded-3xl px-4 py-2 max-w-[90%] text-sm">
+                        {exchange.user}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-                  {/* Advisor message */}
-                  <AnimatePresence>
-                    {shouldShowMessage(index * 2 + 1, index) && (
-                      <motion.div 
-                        className="flex justify-start"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <div className="bg-[#1d1d1d] text-white rounded-3xl px-4 py-2 max-w-[90%] text-sm">
-                          {exchange.advisor}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </React.Fragment>
-              ))
-            )}
+                {/* Advisor message */}
+                <AnimatePresence>
+                  {shouldShowMessage(index * 2 + 1, index) && (
+                    <motion.div 
+                      className="flex justify-start"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="bg-[#1d1d1d] text-white rounded-3xl px-4 py-2 max-w-[90%] text-sm">
+                        {exchange.advisor}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </React.Fragment>
+            ))}
           </div>
           
           {/* Bottom fixed section for mobile */}
