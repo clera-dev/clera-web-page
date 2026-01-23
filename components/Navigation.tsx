@@ -146,12 +146,6 @@ export default function Navigation() {
               >
                 Ask Clera
               </Link>
-              <Link 
-                href="/pricing" 
-                className={isActive('/pricing')}
-              >
-                Pricing
-              </Link>
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-[#4299e1]/40 to-[#4299e1]/40 rounded-lg blur opacity-0 group-hover:opacity-60 transition duration-300"></div>
                 <motion.div
@@ -227,13 +221,6 @@ export default function Navigation() {
                   >
                     <span>Ask Clera</span>
                     <ChevronRight size={16} className={pathname === '/' ? 'text-[#4299e1]' : 'text-gray-400'} />
-                  </Link>
-                  <Link 
-                    href="/pricing" 
-                    className={`flex items-center justify-between text-base ${pathname === '/pricing' ? 'text-[#4299e1] font-medium' : 'text-white'} py-2`}
-                  >
-                    <span>Pricing</span>
-                    <ChevronRight size={16} className={pathname === '/pricing' ? 'text-[#4299e1]' : 'text-gray-400'} />
                   </Link>
                   <div className="border-t border-gray-800 my-2"></div>
                 </div>
