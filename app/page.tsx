@@ -56,39 +56,6 @@ export default function Home() {
     }
   }, [])
 
-  // Add special handling for large displays to fix scroll positioning issues
-  useEffect(() => {
-    if (!isLargeDisplay) return
-    
-    // Force initial position to be clean for large displays
-    if (containerRef.current) {
-      const el = containerRef.current as HTMLElement
-      el.style.position = 'relative'
-      el.style.zIndex = '1'
-    }
-    
-    const handleScroll = () => {
-      // When at the top of the page on large displays, ensure clean layout
-      if (window.scrollY === 0) {
-        requestAnimationFrame(() => {
-          if (containerRef.current) {
-            // Force a repaint without changing visible layout
-            const el = containerRef.current as HTMLElement
-            el.style.display = 'none'
-            void el.offsetHeight // Trigger reflow
-            el.style.display = ''
-          }
-        })
-      }
-    }
-    
-    // Apply initial fix
-    handleScroll()
-    
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [isLargeDisplay])
-
   return (
     <>
       <MobileScrollbarStyle />
