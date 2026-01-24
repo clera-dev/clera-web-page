@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import Logo from './Logo'
-import { motion } from 'framer-motion'
+import { AnimatedButton } from './ui/animated-button'
 
 export default function Navigation() {
   const pathname = usePathname()
@@ -53,21 +53,17 @@ export default function Navigation() {
             <Logo className="my-1" />
           </Link>
           
-          {/* Try it button - always visible */}
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-[#4299e1]/40 to-[#4299e1]/40 rounded-lg blur opacity-0 group-hover:opacity-60 transition duration-300"></div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link
-                href="https://app.askclera.com/"
-                className="relative inline-flex items-center justify-center rounded-md border border-[#4299e1] bg-transparent px-4 py-1 text-sm text-[#4299e1] transition-all duration-300 ease-in-out transform group-hover:scale-102 hover:text-white hover:bg-[#4299e1]"
-              >
-                Try it
-              </Link>
-            </motion.div>
-          </div>
+          {/* Try it button - animated gradient style */}
+          <AnimatedButton
+            href="https://app.askclera.com/"
+            gradientColors={[
+              "rgb(66, 153, 225)",
+              "rgb(99, 179, 237)",
+              "rgb(144, 205, 244)",
+            ]}
+          >
+            Try it
+          </AnimatedButton>
         </div>
       </div>
     </nav>
