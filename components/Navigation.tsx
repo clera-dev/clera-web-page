@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import Logo from './Logo'
-import { AnimatedButton } from './ui/animated-button'
+import { NoiseBackground } from './ui/noise-background'
 
 export default function Navigation() {
   const pathname = usePathname()
@@ -53,17 +53,22 @@ export default function Navigation() {
             <Logo className="my-1" />
           </Link>
           
-          {/* Try it button - animated gradient style */}
-          <AnimatedButton
-            href="https://app.askclera.com/"
+          {/* Try it button - noise background style */}
+          <NoiseBackground
+            containerClassName="w-fit p-1.5 rounded-full"
             gradientColors={[
               "rgb(66, 153, 225)",
               "rgb(99, 179, 237)",
               "rgb(144, 205, 244)",
             ]}
           >
-            Try it
-          </AnimatedButton>
+            <Link
+              href="https://app.askclera.com/"
+              className="inline-flex items-center justify-center cursor-pointer rounded-full bg-gradient-to-r from-neutral-900 via-neutral-900 to-black px-4 py-1.5 text-sm font-medium text-white shadow-[0px_1px_0px_0px_var(--color-neutral-950)_inset,0px_1px_0px_0px_var(--color-neutral-800)] transition-all duration-150 active:scale-98"
+            >
+              Try it
+            </Link>
+          </NoiseBackground>
         </div>
       </div>
     </nav>
