@@ -64,6 +64,8 @@ export default function Navigation() {
           >
             <Link
               href="https://app.askclera.com/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center cursor-pointer rounded-full bg-gradient-to-r from-neutral-900 via-neutral-900 to-black px-4 py-1.5 text-sm font-medium text-white shadow-[0px_1px_0px_0px_var(--color-neutral-950)_inset,0px_1px_0px_0px_var(--color-neutral-800)] transition-all duration-150 active:scale-98"
             >
               Try it

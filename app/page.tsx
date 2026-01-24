@@ -101,6 +101,8 @@ export default function Home() {
             >
               <Link
                 href="https://app.askclera.com/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex w-full sm:w-64 items-center justify-center bg-white text-black border-2 border-black px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-medium shadow-[0_0_0_2px_rgba(0,0,0,1)] transition-colors duration-300 hover:bg-black hover:text-white hover:border-white hover:shadow-[0_0_0_2px_rgba(255,255,255,1)]"
                 style={{ borderRadius: '50px' }}
               >
@@ -191,6 +193,8 @@ export default function Home() {
                   <div className="relative z-10 flex justify-center">
                     <Link
                       href="https://app.askclera.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-flex w-64 items-center justify-center bg-white text-black border-2 border-black px-8 py-6 text-lg font-medium shadow-[0_0_0_2px_rgba(0,0,0,0.5)] transition-all duration-300 hover:bg-black hover:text-white hover:border-white hover:shadow-[0_0_0_2px_rgba(255,255,255,0.5)]"
                       style={{ borderRadius: '50px' }}
                     >

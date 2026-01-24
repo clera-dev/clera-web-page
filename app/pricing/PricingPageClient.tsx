@@ -528,6 +528,8 @@ export default function PricingPageClient() {
 
                   <Link
                     href="https://app.askclera.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200
                       transform hover:scale-[1.02] active:scale-[0.98]
                       ${plan.name === 'Plus'
@@ -604,6 +606,8 @@ export default function PricingPageClient() {
 
                     <Link
                       href="https://app.askclera.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200
                         active:scale-[0.98]
                         ${plan.name === 'Plus'
