@@ -1,10 +1,6 @@
 import React from "react"
 import "../styles/globals.css"
 import { Inter } from "next/font/google"
-import { Toaster } from "sonner"
-import Navigation from "@/components/Navigation"
-import Footer from "@/components/Footer"
-import JsonLd from "./schema"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -71,17 +67,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark bg-black">
       <head>
-        {/* This specific tag helps Google use the circular favicon in search results */}
-        <link rel="icon" type="image/png" href="/clera-favicon-circle.png" media="(prefers-color-scheme: light)" />
-        <link rel="icon" type="image/png" href="/clera-favicon-circle.png" media="(prefers-color-scheme: dark)" />
+        <link rel="icon" type="image/png" href="/clera-favicon.png" />
       </head>
-      <body className={`${inter.variable} font-sans antialiased bg-black overflow-x-hidden`}>
-        <div id="top"></div>
-        <Navigation />
+      <body className={`${inter.variable} font-sans antialiased bg-black text-foreground overflow-x-hidden`}>
         {children}
-        <Footer />
-        <Toaster />
-        <JsonLd />
       </body>
     </html>
   )
